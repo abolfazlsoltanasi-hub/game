@@ -1,0 +1,2873 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0f0c29">
+<meta name="description" content="حدس کلمه — بازی گروهی و انفرادی حدس کلمه با پشتیبانی از هوش مصنوعی و حالت کاملاً آفلاین.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap">
+<title>حدس کلمه | Word Guess</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;overflow-x:hidden;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+:root{
+  --bg-1:#0b0820;--bg-2:#1a0f3d;--bg-3:#2a1b5e;
+  --accent:#a855f7;--accent-2:#06b6d4;
+  --gold:#f59e0b;--green:#22c55e;--red:#ef4444;
+  --text:#f1f5f9;--muted:#94a3b8;--dim:#64748b;
+  --glass:rgba(255,255,255,.05);--glass-hi:rgba(255,255,255,.09);
+  --border:rgba(255,255,255,.10);--border-hi:rgba(255,255,255,.20);
+  --radius:20px;--radius-sm:14px;
+  --shadow-lg:0 24px 60px rgba(0,0,0,.5);
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+body{
+  font-family:"Vazirmatn","Segoe UI",Tahoma,sans-serif;
+  color:var(--text);background:var(--bg-1);
+  padding:20px 14px 60px;direction:rtl;
+  -webkit-font-smoothing:antialiased;position:relative;min-height:100vh;
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important;}
+}
+@media (max-width:420px){
+  .card{backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);}
+  body::before{animation:none;}
+}
+body::before{
+  content:'';position:fixed;inset:-40%;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(168,85,247,.28),transparent 45%),
+    radial-gradient(circle at 80% 30%,rgba(6,182,212,.24),transparent 45%),
+    radial-gradient(circle at 50% 80%,rgba(236,72,153,.20),transparent 50%),
+    linear-gradient(135deg,var(--bg-1),var(--bg-2),var(--bg-3));
+  z-index:-2;animation:bgShift 24s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes bgShift{0%{transform:translate(0,0) scale(1);}50%{transform:translate(2%,-3%) scale(1.06);}100%{transform:translate(-2%,2%) scale(1);}}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.045) 1px,transparent 0);
+  background-size:22px 22px;opacity:.6;
+}
+#app{max-width:980px;margin:0 auto;position:relative;}
+.screen{animation:screenIn .5s cubic-bezier(.2,.7,.2,1);}
+@keyframes screenIn{from{opacity:0;transform:translateY(18px) scale(.985);}to{opacity:1;transform:none;}}
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass));
+  backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
+  border:1px solid var(--border);border-radius:var(--radius);padding:26px;
+  box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.06);
+  position:relative;overflow:hidden;
+}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);}
+.card+.card{margin-top:16px;}
+h1{font-size:clamp(30px,6vw,52px);font-weight:900;text-align:center;letter-spacing:-.02em;
+  background:linear-gradient(120deg,#fff 0%,#c4b5fd 40%,#67e8f9 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.15;}
+h2{font-size:clamp(22px,3.4vw,30px);font-weight:800;margin-bottom:6px;letter-spacing:-.01em;}
+h3{font-size:16px;font-weight:700;margin-bottom:10px;color:#cbd5e1;}
+p.sub{color:var(--muted);font-size:14.5px;line-height:1.9;margin-bottom:18px;}
+button{font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  border:none;border-radius:var(--radius-sm);padding:13px 24px;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  transition:transform .16s cubic-bezier(.2,.7,.2,1),box-shadow .25s,filter .2s,opacity .2s;
+  box-shadow:0 10px 26px -8px rgba(168,85,247,.55),inset 0 1px 0 rgba(255,255,255,.22);
+  position:relative;overflow:hidden;letter-spacing:.01em;}
+button::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;
+  background:rgba(255,255,255,.28);transform:translate(-50%,-50%);transition:width .5s,height .5s;}
+button:active:not(:disabled)::after{width:320px;height:320px;transition:0s;}
+button:hover:not(:disabled){transform:translateY(-2px);
+  box-shadow:0 14px 32px -8px rgba(168,85,247,.7),inset 0 1px 0 rgba(255,255,255,.28);filter:brightness(1.05);}
+button:active:not(:disabled){transform:translateY(0) scale(.985);}
+button:disabled{opacity:.38;cursor:not-allowed;filter:grayscale(.4);}
+button.ghost{background:rgba(255,255,255,.07);border:1px solid var(--border);box-shadow:none;backdrop-filter:blur(8px);}
+button.ghost:hover:not(:disabled){background:rgba(255,255,255,.13);transform:translateY(-2px);box-shadow:none;}
+button.danger{background:linear-gradient(135deg,#f43f5e,#b91c1c);
+  box-shadow:0 10px 26px -8px rgba(239,68,68,.55),inset 0 1px 0 rgba(255,255,255,.2);}
+button.gold{background:linear-gradient(135deg,#f59e0b,#ea580c);
+  box-shadow:0 10px 26px -8px rgba(245,158,11,.6),inset 0 1px 0 rgba(255,255,255,.24);}
+button.green{background:linear-gradient(135deg,#22c55e,#059669);
+  box-shadow:0 10px 26px -8px rgba(34,197,94,.55),inset 0 1px 0 rgba(255,255,255,.2);}
+button.sm{padding:8px 14px;font-size:13px;border-radius:10px;}
+button.icon{padding:10px;width:42px;height:42px;border-radius:12px;
+  display:inline-flex;align-items:center;justify-content:center;font-size:18px;}
+input,select,textarea{font-family:inherit;font-size:16px;width:100%;padding:13px 15px;
+  border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:rgba(0,0,0,.32);color:var(--text);outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;}
+input::placeholder,textarea::placeholder{color:var(--dim);}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:rgba(0,0,0,.42);
+  box-shadow:0 0 0 3px rgba(168,85,247,.22);}
+input:disabled,select:disabled,textarea:disabled{opacity:.4;cursor:not-allowed;}
+select{appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat:no-repeat;background-position:left 12px center;background-size:18px;
+  padding-left:38px;cursor:pointer;}
+select option{background:#1a1730;color:#fff;}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.row.center{justify-content:center;}
+.row.between{justify-content:space-between;}
+.stack>*+*{margin-top:14px;}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;}
+.mt-1{margin-top:8px;}.mt-2{margin-top:16px;}.mt-3{margin-top:24px;}
+.mb-2{margin-bottom:16px;}
+.text-muted{color:var(--muted);font-size:13px;}
+.hidden{display:none !important;}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;
+  background:rgba(255,255,255,.07);border:1px solid var(--border);font-size:13.5px;backdrop-filter:blur(8px);}
+.pill.green{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.42);color:#86efac;}
+.pill.red{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.42);color:#fca5a5;}
+.pill.gold{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.42);color:#fcd34d;}
+.pill.cyan{background:rgba(6,182,212,.14);border-color:rgba(6,182,212,.42);color:#a5f3fc;}
+.pill.purple{background:rgba(168,85,247,.14);border-color:rgba(168,85,247,.42);color:#d8b4fe;}
+.player-item{display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;border-radius:var(--radius-sm);
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+  border:1px solid var(--border);margin-bottom:8px;
+  animation:itemIn .35s cubic-bezier(.2,.7,.2,1) backwards;
+  transition:transform .18s,background .2s,border-color .2s;}
+.player-item:hover{transform:translateX(-3px);border-color:var(--border-hi);}
+@keyframes itemIn{from{opacity:0;transform:translateX(-16px);}}
+.player-item .name{font-weight:700;font-size:15px;}
+.player-item .remove{background:transparent;border:none;color:var(--red);
+  font-size:17px;cursor:pointer;padding:6px 10px;border-radius:9px;
+  box-shadow:none;transition:all .2s;font-weight:900;}
+.player-item .remove:hover{color:#fff;background:rgba(239,68,68,.35);transform:none;}
+.player-item .remove::after{display:none;}
+.badge{padding:3px 9px;font-size:11px;font-weight:700;border-radius:8px;
+  background:linear-gradient(135deg,rgba(245,158,11,.28),rgba(245,158,11,.12));
+  color:var(--gold);border:1px solid rgba(245,158,11,.35);margin-right:8px;}
+.slots{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:28px 0 18px;perspective:900px;}
+.slot{width:56px;height:68px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;font-weight:900;padding-bottom:6px;border-radius:12px;
+  transition:color .25s,transform .3s;}
+.slot:nth-child(2n){animation-delay:-.6s;}
+.slot:nth-child(3n){animation-delay:-1.2s;}
+@keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+.slot::after{content:'';position:absolute;bottom:0;left:8%;right:8%;height:4px;border-radius:4px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  box-shadow:0 0 12px rgba(168,85,247,.6);transition:background .3s,box-shadow .3s;}
+.slot.revealed{color:var(--green);text-shadow:0 0 20px rgba(34,197,94,.6);
+  animation:letterPop .5s cubic-bezier(.2,1.4,.4,1);}
+.slot.revealed::after{background:var(--green);box-shadow:0 0 14px rgba(34,197,94,.75);}
+.slot.hinted{color:var(--gold);}
+.slot.hinted::after{background:var(--gold);box-shadow:0 0 14px rgba(245,158,11,.75);}
+@keyframes letterPop{0%{transform:scale(.2) rotateY(180deg);opacity:0;}60%{transform:scale(1.18) rotateY(0);opacity:1;}100%{transform:scale(1);}}
+.wrong-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0;
+  min-height:42px;max-height:120px;overflow-y:auto;padding:8px;}
+.wrong-letter{display:inline-flex;align-items:center;justify-content:center;
+  width:38px;height:38px;border-radius:11px;flex:0 0 auto;
+  background:rgba(239,68,68,.16);color:#fca5a5;font-weight:900;font-size:20px;
+  border:1px solid rgba(239,68,68,.45);box-shadow:0 0 16px rgba(239,68,68,.25);
+  animation:shake .4s cubic-bezier(.36,.07,.19,.97);}
+.wrong-word{padding:8px 14px;border-radius:11px;font-weight:800;letter-spacing:5px;
+  background:rgba(239,68,68,.14);color:#fca5a5;flex:0 0 auto;
+  border:1px dashed rgba(239,68,68,.55);direction:ltr;text-align:center;
+  animation:shake .4s cubic-bezier(.36,.07,.19,.97);font-size:15px;}
+@keyframes shake{10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(4px);}30%,50%,70%{transform:translateX(-6px);}40%,60%{transform:translateX(6px);}}
+.timer-wrap{display:flex;justify-content:center;margin:4px 0 16px;position:relative;}
+.timer-svg{width:96px;height:96px;transform:rotate(-90deg);}
+.timer-svg .ring-bg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:7;}
+.timer-svg .ring-fg{fill:none;stroke:url(#timerGrad);stroke-width:7;stroke-linecap:round;
+  transition:stroke-dashoffset .95s linear,stroke .35s;}
+.timer-text{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-size:26px;font-weight:900;pointer-events:none;}
+.timer-text .lbl{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1px;}
+.timer-wrap.warn .timer-text{color:var(--red);animation:pulseSoft .85s ease-in-out infinite;}
+.timer-wrap.warn .timer-svg .ring-fg{stroke:var(--red);}
+@keyframes pulseSoft{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.65;transform:scale(1.06);}}
+.alphabet{display:grid;grid-template-columns:repeat(auto-fit,minmax(38px,1fr));gap:6px;margin-top:10px;}
+.alpha-btn{height:40px;border-radius:10px;background:rgba(255,255,255,.06);
+  border:1px solid var(--border);color:#e2e8f0;font-size:16px;font-weight:800;
+  cursor:pointer;transition:all .18s cubic-bezier(.2,.7,.2,1);padding:0;box-shadow:none;font-family:inherit;}
+.alpha-btn::after{display:none;}
+.alpha-btn:hover:not(:disabled){background:rgba(168,85,247,.28);border-color:var(--accent);
+  transform:translateY(-2px) scale(1.04);box-shadow:0 6px 16px -4px rgba(168,85,247,.6);}
+.alpha-btn:disabled{opacity:1;cursor:default;transform:none;}
+.alpha-btn.correct{background:linear-gradient(135deg,rgba(34,197,94,.4),rgba(34,197,94,.18));
+  border-color:var(--green);color:#bbf7d0;box-shadow:0 0 14px rgba(34,197,94,.45);}
+.alpha-btn.wrong{background:linear-gradient(135deg,rgba(239,68,68,.35),rgba(239,68,68,.15));
+  border-color:var(--red);color:#fecaca;opacity:.65;}
+.alpha-btn.hinted{background:linear-gradient(135deg,rgba(245,158,11,.4),rgba(245,158,11,.18));
+  border-color:var(--gold);color:#fde68a;box-shadow:0 0 14px rgba(245,158,11,.45);}
+.full-word{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0;direction:rtl;}
+.full-word input{width:50px;height:58px;padding:0;text-align:center;font-size:26px;font-weight:900;
+  border-radius:12px;transition:transform .15s,border-color .2s,box-shadow .2s;font-family:inherit;}
+.full-word input:focus{transform:translateY(-3px);}
+.score-row{display:flex;justify-content:space-between;align-items:center;
+  padding:14px 18px;border-radius:var(--radius-sm);
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+  border:1px solid var(--border);margin-bottom:8px;transition:transform .2s,border-color .2s;}
+.score-row:hover{transform:translateX(-3px);border-color:var(--border-hi);}
+.score-row.lead{background:linear-gradient(90deg,rgba(245,158,11,.22),rgba(245,158,11,.05));
+  border-color:rgba(245,158,11,.55);box-shadow:0 0 24px -6px rgba(245,158,11,.4);}
+.score-row .rank{font-size:24px;margin-left:6px;}
+.score-row .pts{font-weight:900;color:var(--gold);font-size:21px;font-variant-numeric:tabular-nums;}
+.handoff{text-align:center;padding:42px 22px;}
+.handoff .emoji{font-size:68px;margin-bottom:8px;animation:floaty 2.5s ease-in-out infinite;}
+.handoff .big{font-size:clamp(22px,4vw,28px);font-weight:800;margin:12px 0;line-height:1.5;}
+.handoff .who{color:#67e8f9;font-weight:900;font-size:clamp(30px,6vw,46px);
+  text-shadow:0 0 32px rgba(6,182,212,.65);margin:6px 0;}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 16px;}
+.topic-chip{padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  cursor:pointer;transition:all .2s cubic-bezier(.2,.7,.2,1);color:var(--text);user-select:none;}
+.topic-chip:hover{background:rgba(168,85,247,.24);border-color:var(--accent);transform:translateY(-2px);}
+.topic-chip.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  border-color:transparent;box-shadow:0 8px 20px -6px rgba(168,85,247,.7);color:#fff;}
+.modal-bg{position:fixed;inset:0;background:rgba(3,0,20,.72);backdrop-filter:blur(6px);
+  z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .25s;}
+@keyframes fadeIn{from{opacity:0;}}
+.modal{max-width:460px;width:100%;text-align:center;animation:modalIn .35s cubic-bezier(.2,1.3,.4,1);}
+@keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(20px);}}
+.modal h3{color:#fff;font-size:20px;}
+#toast-stack{position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  z-index:500;pointer-events:none;display:flex;flex-direction:column;gap:8px;
+  align-items:center;max-width:calc(100% - 32px);}
+.toast{pointer-events:auto;padding:12px 20px;border-radius:14px;
+  font-size:14px;font-weight:600;backdrop-filter:blur(14px) saturate(140%);
+  box-shadow:0 14px 32px rgba(0,0,0,.4);border:1px solid var(--border-hi);
+  background:rgba(20,15,45,.9);color:var(--text);
+  animation:toastIn .35s cubic-bezier(.2,1.3,.4,1);
+  white-space:pre-line;text-align:center;max-width:100%;}
+.toast.out{animation:toastOut .3s forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateY(-20px) scale(.92);}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-14px) scale(.95);}}
+.toast.ok{border-color:rgba(34,197,94,.5);color:#bbf7d0;background:rgba(20,60,35,.9);}
+.toast.err{border-color:rgba(239,68,68,.5);color:#fecaca;background:rgba(70,15,25,.9);}
+.toast.info{border-color:rgba(6,182,212,.5);color:#a5f3fc;background:rgba(10,55,75,.9);}
+.toast.ai{border-color:rgba(245,158,11,.5);color:#fcd34d;background:rgba(70,45,5,.9);}
+.toast.warn{border-color:rgba(245,158,11,.5);color:#fde68a;background:rgba(70,50,10,.9);}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:150;display:none;}
+.ai-think{display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 16px;border-radius:999px;
+  background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);
+  color:var(--gold);font-weight:700;font-size:14px;
+  margin:10px auto;width:fit-content;animation:fadeIn .3s;}
+.ai-think .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:dotBounce 1.4s infinite;}
+.ai-think .dot:nth-child(2){animation-delay:.2s;}
+.ai-think .dot:nth-child(3){animation-delay:.4s;}
+@keyframes dotBounce{0%,80%,100%{transform:scale(.7);opacity:.45;}40%{transform:scale(1.15);opacity:1;}}
+.steps{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.step{width:32px;height:4px;border-radius:999px;background:rgba(255,255,255,.1);transition:background .35s;}
+.step.done{background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+.step.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  box-shadow:0 0 12px rgba(168,85,247,.75);animation:pulseSoft 1.6s ease-in-out infinite;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:0 4px;gap:8px;}
+.topbar .brand{font-weight:900;font-size:16px;
+  background:linear-gradient(90deg,#a855f7,#06b6d4);
+  -webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.02em;}
+.topbar .tools{display:flex;gap:6px;align-items:center;}
+.group-box{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+  border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;}
+.group-box .group-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.group-box .group-name{font-weight:800;font-size:15px;}
+.group-box .count{font-size:12px;padding:3px 10px;border-radius:999px;
+  background:rgba(6,182,212,.2);color:#a5f3fc;border:1px solid rgba(6,182,212,.4);font-weight:700;}
+.group-box .count.bad{background:rgba(239,68,68,.18);color:#fecaca;border-color:rgba(239,68,68,.45);}
+.win-overlay{position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(circle at center,rgba(34,197,94,.25),transparent 60%);
+  z-index:149;animation:winPulse 1s ease-out forwards;}
+@keyframes winPulse{0%{opacity:0;transform:scale(.6);}40%{opacity:1;transform:scale(1);}100%{opacity:0;transform:scale(1.4);}}
+details.advanced{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-top:14px;background:rgba(0,0,0,.18);}
+details.advanced summary{cursor:pointer;font-weight:700;font-size:14px;color:#cbd5e1;list-style:none;outline:none;}
+details.advanced summary::-webkit-details-marker{display:none;}
+details.advanced summary::before{content:"▸ ";color:var(--accent);}
+details.advanced[open] summary::before{content:"▾ ";}
+details.advanced .adv-body{margin-top:12px;font-size:13.5px;color:var(--muted);}
+.kbd{display:inline-block;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.1);font-family:monospace;font-size:12px;color:#e2e8f0;}
+
+.progress-bar{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-bottom:14px;}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  transition:width .5s cubic-bezier(.2,.7,.2,1);}
+.turn-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap;}
+.turn-badge{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;
+  background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.35);color:#d8b4fe;}
+.history-row{padding:14px 18px;border-radius:var(--radius-sm);background:rgba(255,255,255,.04);
+  border:1px solid var(--border);margin-bottom:8px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  transition:transform .2s,border-color .2s;}
+.history-row:hover{transform:translateX(-3px);border-color:var(--border-hi);}
+.history-row.win{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06);}
+.history-row.lose{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.05);}
+.lb-row{display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;border-radius:var(--radius-sm);background:rgba(255,255,255,.04);
+  margin-bottom:8px;border:1px solid var(--border);gap:10px;}
+.lb-row.top{background:linear-gradient(90deg,rgba(245,158,11,.22),rgba(245,158,11,.04));
+  border-color:rgba(245,158,11,.5);}
+.pause-overlay{position:fixed;inset:0;background:rgba(3,0,20,.94);
+  backdrop-filter:blur(14px);z-index:300;display:flex;align-items:center;
+  justify-content:center;padding:20px;animation:fadeIn .25s;}
+.hint-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px dashed var(--border);}
+.resume-banner{padding:14px 18px;border-radius:var(--radius-sm);margin-bottom:16px;
+  background:linear-gradient(90deg,rgba(245,158,11,.14),rgba(168,85,247,.14));
+  border:1px solid rgba(245,158,11,.4);display:flex;justify-content:space-between;
+  align-items:center;gap:12px;flex-wrap:wrap;}
+
+/* AI play banner */
+.ai-play-banner{
+  padding:12px 18px;border-radius:var(--radius-sm);margin:8px 0 14px;
+  background:linear-gradient(90deg,rgba(245,158,11,.16),rgba(168,85,247,.10));
+  border:1px solid rgba(245,158,11,.5);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  animation:fadeIn .3s;
+}
+.ai-play-banner .icon{font-size:22px;}
+.ai-play-banner .txt{flex:1 1 auto;font-size:13.5px;font-weight:700;color:#fcd34d;}
+.ai-play-banner .status{font-size:12.5px;color:var(--muted);font-weight:500;}
+
+/* live score pills */
+.live-scores{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0;}
+.live-scores .chip{
+  padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.live-scores .chip .num{color:var(--gold);font-variant-numeric:tabular-nums;}
+
+/* lock state */
+.controls-locked .alpha-btn,
+.controls-locked .full-word input,
+.controls-locked .hint-row button{pointer-events:none;opacity:.35;filter:grayscale(.6);}
+.controls-locked .alpha-btn{transition:none;}
+
+@media (max-width:520px){
+  body{padding:14px 10px 40px;}
+  .card{padding:20px 16px;border-radius:18px;}
+  .slot{width:42px;height:54px;font-size:26px;}
+  .full-word input{width:38px;height:48px;font-size:20px;}
+  .alpha-btn{height:36px;font-size:15px;}
+  .alphabet{grid-template-columns:repeat(auto-fit,minmax(34px,1fr));gap:5px;}
+  button{padding:12px 18px;font-size:14.5px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.05ms !important;}
+}
+</style>
+</head>
+<body>
+<div id="app" role="main"></div>
+<div id="toast-stack" aria-live="polite" aria-atomic="true"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+"use strict";
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const DEFAULT_API_KEY = "";
+
+// ترتیب اولویت مدل‌ها: اول سریع، بعد fallback
+const AI_MODELS = {
+  fast: "gemini-2.0-flash-lite",
+  smart: "gemini-2.5-flash",
+  fallbacks: ["gemini-2.0-flash", "gemini-flash-latest"]
+};
+const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/";
+const AI_TIMEOUT_MS = 6000;
+const AI_MIN_TOKENS = 16;
+
+/* ============================================================
+   CONSTANTS
+   ============================================================ */
+const PERSIAN_LETTER_RE = /[\u0600-\u06FF]/;
+const PERSIAN_WORD_RE   = /^[\u0600-\u06FF\u200C]{2,15}$/;
+const ALPHABET = "ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی".split("");
+const ALPHABET_SET = new Set(ALPHABET);
+
+const TOPICS = ["حیوان","میوه","غذا","شهر","کشور","ورزش","رنگ","شغل","طبیعت","وسیله","اسم","فیلم","کتاب","گل","موسیقی","برند","لباس","ابزار","فضا","اسباب‌بازی"];
+
+const WORD_BANK = {
+  "حیوان": ["شیر","فیل","زرافه","خرس","پلنگ","گربه","سگ","اسب","میمون","خرگوش","موش","گاو","گوسفند","بز","شتر","آهو","گرگ","روباه","قورباغه","مار","لاک‌پشت","کبوتر","عقاب","طوطی","شاهین","جغد","پنگوئن","دلفین","نهنگ","کوسه","کرگدن","اسب‌آبی","کانگورو","پاندا","گوریل","سنجاب","خوک","مرغ","خروس","اردک","قو","لک‌لک","طاووس","شترمرغ","مورچه","زنبور","پروانه","عنکبوت","خفاش","جوجه‌تیغی","راکون","بوقلمون","ملخ","کرم","حلزون","سمور"],
+  "میوه": ["سیب","موز","پرتقال","انگور","هلو","آلو","گلابی","گیلاس","توت","انار","هندوانه","طالبی","خربزه","کیوی","آناناس","انبه","لیمو","نارنگی","زردآلو","شلیل","خرما","انجیر","ازگیل","شاتوت","توت‌فرنگی","نارگیل","پاپایا","آلبالو","گریپ‌فروت","خرمالو"],
+  "غذا": ["پیتزا","کباب","قرمه‌سبزی","آش","عدس‌پلو","زرشک‌پلو","باقالی‌پلو","سبزی‌پلو","کتلت","کوکو","املت","ماکارونی","سوپ","سالاد","دلمه","آبگوشت","حلیم","ماهی","مرغ","خورشت","ته‌چین","شویدپلو","لوبیاپلو","برنج","نان","پنیر","ماست","تخم‌مرغ","سیب‌زمینی","فلافل","همبرگر","ساندویچ","سوشی","لازانیا","کیک","بستنی","شکلات","زولبیا","باقلوا"],
+  "شهر": ["تهران","مشهد","اصفهان","شیراز","تبریز","کرج","اهواز","قم","کرمانشاه","ارومیه","رشت","زاهدان","کرمان","همدان","یزد","اردبیل","بندرعباس","اراک","زنجان","سنندج","قزوین","خرم‌آباد","گرگان","ساری","بوشهر","بیرجند","ایلام","شهرکرد","سمنان","کاشان","نیشابور","لاهیجان","بابل","دزفول"],
+  "کشور": ["ایران","ترکیه","فرانسه","آلمان","ایتالیا","اسپانیا","انگلیس","روسیه","چین","ژاپن","هند","برزیل","مصر","کانادا","استرالیا","مکزیک","آرژانتین","کره","تایلند","ویتنام","عراق","عربستان","پاکستان","افغانستان","یونان","پرتغال","سوئد","نروژ","دانمارک","هلند","سوئیس","بلژیک","اتریش","لهستان","مراکش"],
+  "ورزش": ["فوتبال","والیبال","بسکتبال","شنا","تنیس","کشتی","دوچرخه","دویدن","بدمینتون","پینگ‌پنگ","بوکس","کاراته","جودو","تکواندو","وزنه‌برداری","ژیمناستیک","اسکی","شطرنج","هندبال","راگبی","کبدی","تیراندازی","اسکیت","گلف","بیسبال","کریکت","قایقرانی","کوهنوردی"],
+  "رنگ": ["قرمز","آبی","سبز","زرد","نارنجی","بنفش","صورتی","قهوه‌ای","سیاه","سفید","خاکستری","فیروزه‌ای","طلایی","نقره‌ای","کرم","بژ","نیلی","ارغوانی","زمردی","یاقوتی","سرمه‌ای","یشمی"],
+  "شغل": ["پزشک","معلم","مهندس","راننده","خلبان","آتش‌نشان","پلیس","آشپز","خیاط","نجار","بنا","کشاورز","نقاش","خواننده","بازیگر","وکیل","قاضی","حسابدار","برنامه‌نویس","خبرنگار","دندان‌پزشک","پرستار","عکاس","معمار","کارگردان","مترجم","آرایشگر","کتابدار"],
+  "طبیعت": ["کوه","دریا","جنگل","بیابان","رودخانه","آبشار","دریاچه","جزیره","ساحل","دشت","کویر","غار","آتشفشان","چشمه","تپه","واحه","آسمان","خورشید","ماه","ستاره","ابر","باران","برف","رنگین‌کمان","رعد","برق","طوفان","سیل","زلزله","یخچال","کهکشان"],
+  "وسیله": ["ماشین","دوچرخه","اتوبوس","قطار","هواپیما","کشتی","موتور","تاکسی","کامیون","تراکتور","هلیکوپتر","زیردریایی","راکت","قایق","مترو","چتر","عینک","ساعت","تلفن","رایانه","یخچال","جاروبرقی","آسانسور","اسکوتر"],
+  "اسم": ["علی","زهرا","محمد","فاطمه","حسن","حسین","مریم","نرگس","رضا","سارا","امیر","مینا","پویا","آیدا","بردیا","کوروش","داریوش","آرام","بهار","نیلوفر","کیانا","پارسا","یاسمین","آرش","شیرین"],
+  "فیلم": ["ماتریکس","تایتانیک","آواتار","جوکر","گلادیاتور","اینتراستلار","تلقین","پدرخوانده","پارازیت","مردعنکبوتی","بتمن","سوپرمن","آیرونمن","هالک","انتقام‌جویان","شرک","فروزن","کوکو"],
+  "کتاب": ["شاهنامه","گلستان","بوستان","حافظ","مثنوی","کلیله‌ودمنه","بوف‌کور","سووشون","سمک‌عیار","تاریخ‌بیهقی","قابوس‌نامه","لیلی‌ومجنون","خسرووشیرین","هزارویک‌شب","بینوایان","جنگ‌وصلح","آناکارنینا","مسخ"],
+  "گل": ["رز","نرگس","لاله","بنفشه","آفتابگردان","یاس","شب‌بو","محمدی","اقاقیا","ارکیده","مریم","شقایق","کاکتوس","سوسن","زعفران","نیلوفر","داوودی","اطلسی","میخک","کوکب"],
+  "موسیقی": ["ویولن","پیانو","گیتار","تار","سنتور","نی","کمانچه","قانون","تنبک","دایره","دف","تنبور","رباب","عود","ساکسیفون","ترومپت","فلوت","ویولنسل","آکاردئون"],
+  "برند": ["اپل","سامسونگ","سونی","ال‌جی","هوآوی","شیائومی","نایک","ادیداس","پوما","کوکاکولا","پپسی","مرسدس","بی‌ام‌و","تویوتا","هوندا","رنو","پژو","نیسان","گوگل","آمازون"],
+  "لباس": ["پیراهن","شلوار","کت","کفش","کلاه","شال","روسری","دستکش","جوراب","کراوات","دامن","ژاکت","پالتو","تی‌شرت","کمربند","چکمه","مانتو","بلوز","شلوارک"],
+  "ابزار": ["چکش","پیچ‌گوشتی","انبردست","اره","متر","مته","قیچی","سوهان","گونیا","تیشه","پرچ","سنباده","کلید","پیچ","میخ","سطل"],
+  "فضا": ["ماه","خورشید","زمین","مریخ","زحل","مشتری","ستاره","سیاره","کهکشان","شهاب‌سنگ","سفینه","فضانورد","تلسکوپ","دنباله‌دار"],
+  "اسباب‌بازی": ["عروسک","توپ","پازل","لگو","بادکنک","بشکن","تاب","سرسره","فرفره"]
+};
+
+const FALLBACK_WORDS = ["سلام","کتاب","درخت","آسمان","پرنده","ماهی","پروانه","خورشید","ستاره","دریا","کوه","باران"];
+
+const MIN_PLAYERS = 2;
+const MAX_PLAYERS = 12;
+const MIN_GROUP_SIZE = 2;
+const MAX_GROUPS = 6;
+
+const SETTINGS_KEY = "wordguess.settings.v2";
+const GAME_KEY = "wordguess.game.v2";
+const LEADERBOARD_KEY = "wordguess.leaderboard.v2";
+
+const MIN_OUTPUT_TOKENS  = 16;
+const MAX_HINTS = 3;
+const HINT_PENALTY = 25;
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3);
+const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const randPick = a => a[(Math.random() * a.length) | 0];
+
+function el(tag, attrs = {}, ...children) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === "class") e.className = v;
+    else if (k === "html") e.innerHTML = v;
+    else if (k === "text") e.textContent = v;
+    else if (k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === "dataset") Object.assign(e.dataset, v);
+    else if (k === "style" && typeof v === "object") Object.assign(e.style, v);
+    else e.setAttribute(k, v);
+  }
+  for (const c of children) {
+    if (c == null || c === false) continue;
+    e.appendChild(typeof c === "string" || typeof c === "number" ? document.createTextNode(String(c)) : c);
+  }
+  return e;
+}
+const clear = n => { while (n && n.firstChild) n.removeChild(n.firstChild); };
+
+/* ============================================================
+   STORAGE (with debounced save)
+   ============================================================ */
+let _saveTimer = null;
+function scheduleSave(fn, key, value) {
+  if (_saveTimer) clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => { try { fn(key, value); } catch {} }, 400);
+}
+
+const Store = {
+  loadSettings() { try { const r = localStorage.getItem(SETTINGS_KEY); return r ? JSON.parse(r) : null; } catch { return null; } },
+  saveSettings(d) { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(d)); } catch {} },
+
+  loadGame() { try { const r = localStorage.getItem(GAME_KEY); return r ? JSON.parse(r) : null; } catch { return null; } },
+  saveGame(d) { try { localStorage.setItem(GAME_KEY, JSON.stringify(d)); } catch {} },
+  clearGame() { try { localStorage.removeItem(GAME_KEY); } catch {} },
+
+  loadLeaderboard() { try { const r = localStorage.getItem(LEADERBOARD_KEY); return r ? JSON.parse(r) : []; } catch { return []; } },
+  saveLeaderboard(a) { try { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(a)); } catch {} }
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const savedSettings = Store.loadSettings() || {};
+
+const State = {
+  screen: "splash",
+  players: [],
+  groups: [],
+  useGroups: false,
+  settings: {
+    time: savedSettings.time ?? 60,
+    difficulty: savedSettings.difficulty || "medium",
+    rounds: savedSettings.rounds ?? 1,
+    aiEnabled: savedSettings.aiEnabled !== false,
+    soundOn: savedSettings.soundOn !== false,
+    hapticsOn: savedSettings.hapticsOn !== false,
+    apiKey: savedSettings.apiKey || DEFAULT_API_KEY,
+    offlineMode: savedSettings.offlineMode === true
+  },
+
+  currentRound: 1,
+  turnQueue: [],
+  turnIdx: 0,
+  turnHistory: [],
+
+  // per-turn
+  currentTurn: null,
+  word: "",
+  topic: "",
+  giverId: null,
+  guesserIds: [],
+  guesserLabel: "",
+  revealed: [],
+  hintedIdx: [],
+  wrongLetters: [],
+  wrongWords: [],
+  correctLetters: new Set(),
+  maxWrongLetters: 5,
+  maxWrongWords: 2,
+  hintsUsed: 0,
+  timeLeft: 0,
+  timeStartedAt: 0,
+  timerId: null,
+  turnActive: false,
+  turnResolved: false,
+  turnToken: 0,
+  paused: false,
+
+  // AI-specific per-turn
+  turnAbort: null,          // AbortController for current turn
+  aiTurn: false,            // آیا در این نوبت AI حدس‌زننده است
+  aiFailureCount: 0,        // تعداد خطای متوالی AI در این نشست
+  aiOfflineFallback: false, // در صورت خطاهای پی‌درپی، به حالت آفلاین برو
+
+  scores: {},
+  stats: {},
+
+  lastTurnResult: null,
+  gameStartedAt: 0,
+  leaderboardSaved: false  // ← باگ‌فیکس: جلوگیری از ثبت تکراری
+};
+
+function persistSettings() {
+  Store.saveSettings({
+    time: State.settings.time,
+    difficulty: State.settings.difficulty,
+    rounds: State.settings.rounds,
+    aiEnabled: State.settings.aiEnabled,
+    soundOn: State.settings.soundOn,
+    hapticsOn: State.settings.hapticsOn,
+    apiKey: State.settings.apiKey,
+    offlineMode: State.settings.offlineMode
+  });
+}
+
+function saveGameState() {
+  if (State.screen === "splash" || State.screen === "end") { Store.clearGame(); return; }
+  if (!State.turnQueue.length) return;
+  try {
+    const data = {
+      screen: State.screen,
+      players: State.players,
+      groups: State.groups,
+      useGroups: State.useGroups,
+      currentRound: State.currentRound,
+      turnQueue: State.turnQueue,
+      turnIdx: State.turnIdx,
+      turnHistory: State.turnHistory,
+      currentTurn: State.currentTurn,
+      word: State.word,
+      topic: State.topic,
+      giverId: State.giverId,
+      guesserIds: State.guesserIds,
+      guesserLabel: State.guesserLabel,
+      revealed: State.revealed,
+      hintedIdx: State.hintedIdx,
+      wrongLetters: State.wrongLetters,
+      wrongWords: State.wrongWords,
+      correctLetters: [...State.correctLetters],
+      maxWrongLetters: State.maxWrongLetters,
+      maxWrongWords: State.maxWrongWords,
+      hintsUsed: State.hintsUsed,
+      timeLeft: State.timeLeft,
+      scores: State.scores,
+      stats: State.stats,
+      gameStartedAt: State.gameStartedAt,
+      aiTurn: State.aiTurn,
+      savedAt: Date.now()
+    };
+    Store.saveGame(data);
+  } catch {}
+}
+
+function loadAndResumeGame() {
+  const data = Store.loadGame();
+  if (!data) return false;
+  try {
+    Object.assign(State, {
+      players: data.players || [],
+      groups: data.groups || [],
+      useGroups: !!data.useGroups,
+      currentRound: data.currentRound || 1,
+      turnQueue: data.turnQueue || [],
+      turnIdx: data.turnIdx || 0,
+      turnHistory: data.turnHistory || [],
+      currentTurn: data.currentTurn || null,
+      word: data.word || "",
+      topic: data.topic || "",
+      giverId: data.giverId || null,
+      guesserIds: data.guesserIds || [],
+      guesserLabel: data.guesserLabel || "",
+      revealed: data.revealed || [],
+      hintedIdx: data.hintedIdx || [],
+      wrongLetters: data.wrongLetters || [],
+      wrongWords: data.wrongWords || [],
+      correctLetters: new Set(data.correctLetters || []),
+      maxWrongLetters: data.maxWrongLetters || 5,
+      maxWrongWords: data.maxWrongWords || 2,
+      hintsUsed: data.hintsUsed || 0,
+      scores: data.scores || {},
+      stats: data.stats || {},
+      gameStartedAt: data.gameStartedAt || Date.now(),
+      aiTurn: !!data.aiTurn,
+      turnActive: false,
+      turnResolved: false,
+      paused: false
+    });
+    // ذخیره‌شده در میانهٔ نوبت → نوبت را از ابتدا شروع کن (امن‌ترین حالت)
+    if (data.screen === "guess" && State.word && State.turnActive !== false && data.revealed?.some?.(Boolean)) {
+      // برو به handoffGuess تا کاربر دوباره شروع کند
+      setScreen("handoffGuess");
+    } else if (data.screen === "turnResult") {
+      setScreen("turnResult");
+    } else {
+      setScreen("handoffGiver");
+    }
+    return true;
+  } catch (e) { console.warn("Resume error:", e); return false; }
+}
+
+function hasSavedGame() { return !!Store.loadGame(); }
+
+/* ============================================================
+   SOUND & HAPTICS
+   ============================================================ */
+let audioCtx = null;
+function initAudio() {
+  if (audioCtx) return;
+  try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch { audioCtx = null; }
+}
+function beep(freq, dur, type = "sine", vol = .08) {
+  if (!State.settings.soundOn) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime + dur);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch {}
+}
+const sfx = {
+  click:   () => beep(620, .04, "square", .05),
+  pop:     () => beep(880, .05, "sine", .06),
+  correct: () => { beep(660, .08, "sine", .1); setTimeout(() => beep(990, .12, "sine", .1), 70); },
+  wrong:   () => beep(180, .18, "sawtooth", .08),
+  win:     () => { [523, 659, 784, 1047, 1319].forEach((f, i) => setTimeout(() => beep(f, .16, "sine", .11), i * 90)); },
+  lose:    () => { [420, 300, 200].forEach((f, i) => setTimeout(() => beep(f, .22, "sawtooth", .09), i * 150)); },
+  tick:    () => beep(1180, .035, "square", .05),
+  aiPing:  () => beep(940, .06, "triangle", .05),
+  hint:    () => { beep(660, .1, "triangle", .08); setTimeout(() => beep(880, .12, "triangle", .08), 80); }
+};
+function vibrate(p) {
+  if (!State.settings.hapticsOn) return;
+  try { if (navigator.vibrate) navigator.vibrate(p); } catch {}
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function toast(msg, type = "info", ms = 2600) {
+  const stack = $("#toast-stack");
+  if (!stack) return;
+  const t = el("div", { class: `toast ${type}` }, msg);
+  stack.appendChild(t);
+  setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 320); }, ms);
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function showModal({ title, bodyHtml, confirmLabel = "تأیید", cancelLabel = "انصراف", onConfirm, onCancel, danger = false, hideCancel = false }) {
+  const bg = el("div", { class: "modal-bg", role: "dialog", "aria-modal": "true" });
+  const card = el("div", { class: "card modal" });
+  card.innerHTML = `<h3>${escapeHtml(title)}</h3><div style="margin:14px 0;color:#cbd5e1;line-height:1.95;font-size:14.5px;">${bodyHtml}</div>`;
+  const row = el("div", { class: "row center" });
+  if (!hideCancel) {
+    const cancel = el("button", { class: "ghost" }, cancelLabel);
+    cancel.onclick = () => { bg.remove(); onCancel && onCancel(); };
+    row.append(cancel);
+  }
+  const ok = el("button", { class: danger ? "danger" : "" }, confirmLabel);
+  ok.onclick = () => { bg.remove(); onConfirm && onConfirm(); };
+  row.append(ok);
+  card.append(row);
+  bg.append(card);
+  bg.addEventListener("click", e => { if (e.target === bg && !hideCancel) { bg.remove(); onCancel && onCancel(); } });
+  document.body.append(bg);
+  setTimeout(() => ok.focus(), 50);
+}
+
+function showHowToPlay() {
+  showModal({
+    title: "🎯  چگونه بازی کنیم؟",
+    hideCancel: true,
+    confirmLabel: "متوجه شدم",
+    bodyHtml: `
+      <div style="text-align:right;">
+        <p style="margin-bottom:10px;"><b>۱.</b> بازیکنان (حداقل ۲ نفر) یا بازیکنان هوش مصنوعی اضافه کنید.</p>
+        <p style="margin-bottom:10px;"><b>۲.</b> حالت انفرادی یا گروهی را انتخاب کنید.</p>
+        <p style="margin-bottom:10px;"><b>۳.</b> در هر نوبت یک «راهنما» موضوع و کلمه انتخاب می‌کند و بقیه با حدس حروف یا کل کلمه امتیاز می‌گیرند.</p>
+        <p style="margin-bottom:10px;"><b>۴.</b> از راهنمایی (💡) برای آشکار کردن یک حرف استفاده کنید — اما امتیاز کم می‌شود.</p>
+        <p style="margin-bottom:10px;"><b>۵.</b> وقتی AI حدس‌زننده باشد، شما فقط تماشا می‌کنید — ورودی‌های انسانی غیرفعال می‌شوند.</p>
+        <p style="margin-bottom:0;"><b>۶.</b> بازی کاملاً آفلاین با بانک کلمات محلی کار می‌کند؛ برای AI بهتر، کلید Gemini خودتان را در تنظیمات وارد کنید.</p>
+      </div>
+    `
+  });
+}
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+function confetti() {
+  const cvs = $("#confetti");
+  if (!cvs) return;
+  cvs.style.display = "block";
+  const ctx = cvs.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const W = cvs.width = window.innerWidth * dpr;
+  const H = cvs.height = window.innerHeight * dpr;
+  cvs.style.width = window.innerWidth + "px";
+  cvs.style.height = window.innerHeight + "px";
+  const COLORS = ["#a855f7","#06b6d4","#f59e0b","#22c55e","#ef4444","#ec4899","#eab308"];
+  const parts = Array.from({ length: 120 }, () => ({
+    x: Math.random() * W, y: -20 - Math.random() * H * .5,
+    vx: (Math.random() - .5) * 5 * dpr, vy: (2 + Math.random() * 3) * dpr,
+    r: (4 + Math.random() * 6) * dpr,
+    col: COLORS[(Math.random() * COLORS.length) | 0],
+    rot: Math.random() * Math.PI, vr: (Math.random() - .5) * .3
+  }));
+  const start = performance.now(); const DURATION = 3000;
+  function frame(t) {
+    const elapsed = t - start;
+    if (elapsed > DURATION) { cvs.style.display = "none"; ctx.clearRect(0, 0, W, H); return; }
+    ctx.clearRect(0, 0, W, H);
+    const alpha = clamp(1 - elapsed / DURATION, 0, 1);
+    ctx.globalAlpha = alpha;
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy; p.vy += .08 * dpr; p.rot += p.vr;
+      ctx.save();
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.col;
+      ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 1.6);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+function winOverlay() {
+  const ov = el("div", { class: "win-overlay" });
+  document.body.append(ov);
+  setTimeout(() => ov.remove(), 1000);
+}
+
+/* ============================================================
+   AI CLIENT — Optimized & Robust
+   ============================================================ */
+let _workingModel = null;
+
+const AI_AVAILABLE = () =>
+  State.settings.aiEnabled &&
+  !State.settings.offlineMode &&
+  !State.aiOfflineFallback &&
+  State.settings.apiKey &&
+  State.settings.apiKey.length > 10;
+
+function abortCurrentTurn() {
+  if (State.turnAbort) {
+    try { State.turnAbort.abort(); } catch {}
+    State.turnAbort = null;
+  }
+}
+
+async function callAI(prompt, { maxTokens = 32, temperature = 1.0, signal, mode = "fast" } = {}) {
+  if (!AI_AVAILABLE()) throw new Error("AI غیرفعال است");
+  const key = State.settings.apiKey;
+
+  // اولویت مدل‌ها
+  let models;
+  if (_workingModel) {
+    models = [_workingModel, ...AI_MODELS.fallbacks.filter(m => m !== _workingModel)];
+  } else {
+    const primary = mode === "smart" ? AI_MODELS.smart : AI_MODELS.fast;
+    models = [primary, ...AI_MODELS.fallbacks.filter(m => m !== primary)];
+  }
+  // در حالت fast حداکثر ۲ مدل، در smart حداکثر ۳ مدل
+  const maxTries = mode === "fast" ? 2 : 3;
+  models = models.slice(0, maxTries);
+
+  let lastError = null;
+
+  for (const model of models) {
+    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => { try { ctrl.abort(); } catch {} }, AI_TIMEOUT_MS);
+    const onExtAbort = () => { try { ctrl.abort(); } catch {} };
+    if (signal) signal.addEventListener("abort", onExtAbort, { once: true });
+
+    try {
+      const url = `${ENDPOINT}${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: ctrl.signal,
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }], role: "user" }],
+          generationConfig: {
+            temperature,
+            maxOutputTokens: Math.max(MIN_OUTPUT_TOKENS, maxTokens),
+            topP: 0.92,
+            topK: 32
+          },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT",        threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_HATE_SPEECH",       threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
+          ]
+        })
+      });
+
+      clearTimeout(timer);
+      if (signal) signal.removeEventListener("abort", onExtAbort);
+
+      if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+
+      if (!res.ok) {
+        lastError = new Error(`${model} → HTTP ${res.status}`);
+        continue;
+      }
+
+      const data = await res.json().catch(() => null);
+      if (!data) { lastError = new Error(`${model}: پاسخ نامعتبر`); continue; }
+      if (data?.promptFeedback?.blockReason) { lastError = new Error(`${model}: blocked`); continue; }
+
+      const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("").trim() || "";
+      if (!text) { lastError = new Error(`${model}: پاسخ خالی`); continue; }
+
+      _workingModel = model;
+      State.aiFailureCount = 0;
+      return text;
+    } catch (e) {
+      clearTimeout(timer);
+      if (signal) signal.removeEventListener("abort", onExtAbort);
+      if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+      if (e.name === "AbortError") { lastError = new Error(`${model}: timeout`); continue; }
+      lastError = e;
+    }
+  }
+
+  State.aiFailureCount++;
+  // اگر خطاهای پی‌درپی شد، به حالت آفلاین سوئیچ کن
+  if (State.aiFailureCount >= 4) {
+    State.aiOfflineFallback = true;
+    toast("⚠️ AI چند بار خطا داد — از این به بعد حالت آفلاین استفاده می‌شود", "warn", 3500);
+  }
+  throw lastError || new Error("همهٔ مدل‌ها خطا دادند");
+}
+
+/* ------------------------------------------------------------
+   Prompt builders — دقیق و با زمینه کامل
+   ------------------------------------------------------------ */
+function buildTopicPrompt() {
+  return `نقش تو: یک دستیار بازی «حدس کلمه» فارسی هستی.
+
+━━━ وظیفه ━━━
+یک موضوع فارسی، کوتاه، جذاب و مناسب بازی حدس کلمه پیشنهاد بده.
+موضوع باید یک کلمه باشد (مثل: حیوان، غذا، شهر، ورزش، فیلم).
+
+━━━ قواعد قطعی ━━━
+✗ هیچ توضیح، علامت، نقل‌قول یا نقطه‌گذاری ننویس
+✗ بیش از یک کلمه نده
+✓ فقط همان یک موضوع را بنویس`;
+}
+
+function buildWordPrompt(topic) {
+  return `نقش تو: دستیار «راهنما» در بازی حدس کلمه فارسی هستی.
+
+━━━ زمینه ━━━
+• موضوع انتخاب‌شده: «${topic}»
+
+━━━ وظیفه ━━━
+یک کلمهٔ فارسی ساده در موضوع «${topic}» پیشنهاد بده که راهنما بتواند به بازیکنان نشان دهد.
+
+━━━ قواعد قطعی ━━━
+✗ نیم‌فاصله استفاده نکن
+✗ طول کلمه باید بین ۳ تا ۸ حرف باشد
+✗ بدون اعداد، علامت، یا توضیح
+✓ فقط همان یک کلمه را بنویس`;
+}
+
+function buildLetterBatchPrompt(ctx, count = 3) {
+  const pattern = ctx.revealed.map((r, i) => r ? ctx.word[i] : "ـ").join(" ");
+  const revealedLetters = [...new Set(ctx.word.split("").filter((_, i) => ctx.revealed[i]))];
+  const remaining = ALPHABET.filter(l => !ctx.correctLetters.has(l) && !ctx.wrongLetters.includes(l));
+  const prevWords = ctx.wrongWords.length ? ctx.wrongWords.join("، ") : "—";
+
+  return `نقش تو: یک بازیکن حرفه‌ای در بازی «حدس کلمه» فارسی هستی و باید حرف حدس بزنی.
+
+━━━ وضعیت فعلی بازی ━━━
+• موضوع کلمه: «${ctx.topic}»
+• تعداد حروف کلمه: ${ctx.word.length}
+• الگوی فعلی: ${pattern}   (ـ یعنی هنوز کشف نشده)
+• حروف کشف‌شده تا الان: ${revealedLetters.length ? revealedLetters.join("، ") : "هیچ"}
+• حروف اشتباه قبلی: ${ctx.wrongLetters.length ? ctx.wrongLetters.join("، ") : "هیچ"}
+• حدس‌های کامل اشتباه: ${prevWords}
+• حروف هنوز استفاده‌نشده در الفبا: ${remaining.join("، ")}
+
+━━━ روش فکر کردن ━━━
+۱. با توجه به موضوع «${ctx.topic}» فهرستی از کلمات ممکن با ${ctx.word.length} حرف در ذهنت بساز.
+۲. کلماتی که با الگوی ${pattern} سازگارند را غربال کن.
+۳. کلماتی که حرف اشتباه در آن‌ها هست را حذف کن.
+۴. پرتکرارترین حرف در کاندیدهای باقی‌مانده را انتخاب کن.
+
+━━━ وظیفه ━━━
+${count} حرف برتر را بهترتیب از پراحتمال‌ترین به کم‌احتمال‌ترین بده.
+
+━━━ قواعد قطعی ━━━
+✗ حرفی که کشف یا اشتباه شده را تکرار نکن
+✗ هیچ توضیح، نقطه یا کاراکتر اضافه‌ای ننویس
+✓ حروف را با ویرگول فارسی «،» جدا کن
+✓ نمونهٔ خروجی: ر، ب، م`;
+}
+
+function buildWordGuessPrompt(ctx) {
+  const pattern = ctx.revealed.map((r, i) => r ? ctx.word[i] : "ـ").join(" ");
+  const prevWords = ctx.wrongWords.length ? ctx.wrongWords.join("، ") : "—";
+
+  return `نقش تو: یک بازیکن حرفه‌ای در بازی «حدس کلمه» فارسی هستی و می‌خواهی کل کلمه را حدس بزنی.
+
+━━━ وضعیت فعلی بازی ━━━
+• موضوع کلمه: «${ctx.topic}»
+• تعداد حروف: دقیقاً ${ctx.word.length} حرف
+• الگوی فعلی: ${pattern}   (ـ یعنی هنوز کشف نشده)
+• حروف اشتباه (نباید در کلمه باشند): ${ctx.wrongLetters.length ? ctx.wrongLetters.join("، ") : "هیچ"}
+• حدس‌های کامل اشتباه قبلی: ${prevWords}
+
+━━━ روش فکر کردن ━━━
+۱. فهرستی از کلمات ${ctx.topic} با ${ctx.word.length} حرف در ذهنت بساز.
+۲. کلماتی که با الگوی ${pattern} سازگارند را جدا کن.
+۳. کلماتی که حروف اشتباه دارند را حذف کن.
+۴. بهترین کاندید را انتخاب کن.
+
+━━━ قواعد قطعی ━━━
+✗ کلمه‌ای که حروف اشتباه در آن هست نده
+✗ حدس اشتباه قبلی را تکرار نکن
+✗ توضیح یا علامت اضافه نکن
+✓ فقط همان یک کلمهٔ ${ctx.word.length} حرفی را بنویس`;
+}
+
+/* ------------------------------------------------------------
+   Response parsers
+   ------------------------------------------------------------ */
+function extractSinglePersianWord(text) {
+  if (!text) return "";
+  const cleaned = text.replace(/[^\u0600-\u06FF\u200C\s]/g, " ").trim();
+  if (!cleaned) return "";
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  // طولانی‌ترین کلمهٔ فارسی را برگردان
+  let best = "";
+  for (const p of parts) {
+    if (PERSIAN_LETTER_RE.test(p) && p.length > best.length) best = p;
+  }
+  return best;
+}
+
+function normalizeLetter(l) {
+  if (!l) return null;
+  const map = { "آ": "ا", "أ": "ا", "إ": "ا", "ء": null, "ئ": "ی", "ۀ": "ه", "ة": "ه", "ي": "ی", "ك": "ک", "ۀ": "ه" };
+  const base = l.replace(/\u200C/g, "");
+  const mapped = (map[base] !== undefined) ? map[base] : base;
+  if (!mapped) return null;
+  return ALPHABET_SET.has(mapped) ? mapped : null;
+}
+
+function parseLetterBatch(text, ctx, count) {
+  if (!text) return [];
+  const found = text.match(/[\u0600-\u06FF]/g) || [];
+  const seen = new Set();
+  const out = [];
+  for (const ch of found) {
+    const n = normalizeLetter(ch);
+    if (!n) continue;
+    if (seen.has(n)) continue;
+    if (ctx.correctLetters.has(n) || ctx.wrongLetters.includes(n)) continue;
+    seen.add(n);
+    out.push(n);
+    if (out.length >= count) break;
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------
+   High-level AI tasks
+   ------------------------------------------------------------ */
+async function aiSuggestTopic(signal) {
+  try {
+    const t = await callAI(buildTopicPrompt(), { maxTokens: 16, temperature: 1.05, signal, mode: "fast" });
+    const clean = extractSinglePersianWord(t);
+    if (!clean || clean.length > 20) return null;
+    return clean;
+  } catch (e) {
+    if (e.name === "AbortError") return null;
+    console.warn("AI topic:", e.message);
+    return null;
+  }
+}
+
+async function aiSuggestWord(topic, signal) {
+  try {
+    const t = await callAI(buildWordPrompt(topic), { maxTokens: 20, temperature: 1.0, signal, mode: "fast" });
+    const clean = extractSinglePersianWord(t);
+    if (clean.length < 2 || clean.length > 15) return null;
+    return clean;
+  } catch (e) {
+    if (e.name === "AbortError") return null;
+    console.warn("AI word:", e.message);
+    return null;
+  }
+}
+
+async function aiSuggestLetters(ctx, count, signal) {
+  const text = await callAI(buildLetterBatchPrompt(ctx, count), {
+    maxTokens: 24, temperature: 1.0, signal, mode: "fast"
+  });
+  return parseLetterBatch(text, ctx, count);
+}
+
+async function aiGuessWord(ctx, signal) {
+  const text = await callAI(buildWordGuessPrompt(ctx), {
+    maxTokens: 20, temperature: 0.7, signal, mode: "smart"
+  });
+  const w = extractSinglePersianWord(text);
+  if (!w || w.length !== ctx.word.length) return null;
+  if (ctx.wrongWords.includes(w)) return null;
+  return w;
+}
+
+/* ============================================================
+   WORD BANK
+   ============================================================ */
+function getWordFromBank(topic) {
+  const list = WORD_BANK[topic];
+  if (!list || !list.length) return randPick(FALLBACK_WORDS);
+  return randPick(list);
+}
+function getRandomTopic() { return randPick(TOPICS); }
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+function setScreen(name, opts = {}) {
+  State.screen = name;
+  render();
+  if (!opts.noSave) {
+    // debounce: نوشتن مکرر در localStorage کند است
+    scheduleSave((k, v) => Store.saveGame(v), GAME_KEY, captureGameState());
+  }
+  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+}
+
+function captureGameState() {
+  if (State.screen === "splash" || State.screen === "end") return null;
+  if (!State.turnQueue.length) return null;
+  return {
+    screen: State.screen, players: State.players, groups: State.groups,
+    useGroups: State.useGroups, currentRound: State.currentRound,
+    turnQueue: State.turnQueue, turnIdx: State.turnIdx, turnHistory: State.turnHistory,
+    currentTurn: State.currentTurn, word: State.word, topic: State.topic,
+    giverId: State.giverId, guesserIds: State.guesserIds, guesserLabel: State.guesserLabel,
+    revealed: State.revealed, hintedIdx: State.hintedIdx,
+    wrongLetters: State.wrongLetters, wrongWords: State.wrongWords,
+    correctLetters: [...State.correctLetters],
+    maxWrongLetters: State.maxWrongLetters, maxWrongWords: State.maxWrongWords,
+    hintsUsed: State.hintsUsed, timeLeft: State.timeLeft,
+    scores: State.scores, stats: State.stats, gameStartedAt: State.gameStartedAt,
+    aiTurn: State.aiTurn, savedAt: Date.now()
+  };
+}
+
+function render() {
+  const app = $("#app");
+  clear(app);
+  const wrapper = el("div", { class: "screen" });
+  app.append(wrapper);
+
+  switch (State.screen) {
+    case "splash":       renderSplash(wrapper); break;
+    case "players":      renderPlayers(wrapper); break;
+    case "mode":         renderMode(wrapper); break;
+    case "groups":       renderGroups(wrapper); break;
+    case "settings":     renderSettings(wrapper); break;
+    case "handoffGiver": renderHandoffGiver(wrapper); break;
+    case "wordChoice":   renderWordChoice(wrapper); break;
+    case "handoffGuess": renderHandoffGuess(wrapper); break;
+    case "guess":        renderGuess(wrapper); break;
+    case "turnResult":   renderTurnResult(wrapper); break;
+    case "history":      renderHistory(wrapper); break;
+    case "leaderboard":  renderLeaderboard(wrapper); break;
+    case "end":          renderEnd(wrapper); break;
+    default:             renderSplash(wrapper);
+  }
+}
+
+function topbar(opts = {}) {
+  const bar = el("div", { class: "topbar" });
+  bar.append(el("div", { class: "brand" }, "🎯 حدس کلمه"));
+  const tools = el("div", { class: "tools" });
+
+  if (opts.pause && State.turnActive && !State.turnResolved) {
+    const pauseBtn = el("button", { class: "ghost icon", title: "توقف", "aria-label": "توقف" }, "⏸");
+    pauseBtn.onclick = () => { sfx.click(); pauseGame(); };
+    tools.append(pauseBtn);
+  }
+
+  if (opts.leaderboard) {
+    const lbBtn = el("button", { class: "ghost icon", title: "جدول رکوردها", "aria-label": "رکوردها" }, "🏆");
+    lbBtn.onclick = () => { sfx.click(); setScreen("leaderboard"); };
+    tools.append(lbBtn);
+  }
+
+  if (opts.history && State.turnHistory.length) {
+    const hBtn = el("button", { class: "ghost icon", title: "تاریخچه", "aria-label": "تاریخچه" }, "📜");
+    hBtn.onclick = () => { sfx.click(); setScreen("history"); };
+    tools.append(hBtn);
+  }
+
+  const sound = el("button", {
+    class: "ghost icon",
+    title: State.settings.soundOn ? "قطع صدا" : "روشن کردن صدا",
+    "aria-label": "تغییر وضعیت صدا"
+  }, State.settings.soundOn ? "🔊" : "🔇");
+  sound.onclick = () => {
+    State.settings.soundOn = !State.settings.soundOn;
+    sound.textContent = State.settings.soundOn ? "🔊" : "🔇";
+    persistSettings();
+    if (State.settings.soundOn) sfx.click();
+  };
+  tools.append(sound);
+  bar.append(tools);
+  return bar;
+}
+
+function stepsBar(current, total) {
+  const wrap = el("div", { class: "steps" });
+  for (let i = 0; i < total; i++) {
+    const s = el("div", { class: "step" });
+    if (i < current) s.classList.add("done");
+    else if (i === current) s.classList.add("active");
+    wrap.append(s);
+  }
+  return wrap;
+}
+
+const getPlayer = id => State.players.find(p => p.id === id);
+const getGroup  = id => State.groups.find(g => g.id === id);
+const levelFa   = l => ({ easy: "مبتدی", medium: "متوسط", hard: "حرفه‌ای" })[l] || l;
+
+/* ============================================================
+   SPLASH
+   ============================================================ */
+function renderSplash(root) {
+  root.append(topbar({ leaderboard: true }));
+  const card = el("div", { class: "card", style: { textAlign: "center", padding: "52px 26px" } });
+  card.innerHTML = `
+    <div style="font-size:72px;margin-bottom:6px;animation:floaty 3s ease-in-out infinite;">🎯</div>
+    <h1>حدس کلمه</h1>
+    <p class="sub" style="margin-top:10px;">بازی گروهی حدس کلمه<br>با پشتیبانی از هوش مصنوعی Gemini و حالت آفلاین</p>
+  `;
+
+  if (hasSavedGame()) {
+    const banner = el("div", { class: "resume-banner" });
+    banner.innerHTML = `<div style="font-weight:700;">💾 یک بازی ذخیره‌شده داری</div>`;
+    const rRow = el("div", { class: "row" });
+    const resumeBtn = el("button", { class: "green sm" }, "ادامه بده");
+    const discardBtn = el("button", { class: "ghost sm" }, "حذف");
+    resumeBtn.onclick = () => {
+      sfx.click();
+      if (loadAndResumeGame()) toast("بازی بازیابی شد", "ok");
+      else { toast("خطا در بازیابی", "err"); Store.clearGame(); render(); }
+    };
+    discardBtn.onclick = () => { sfx.click(); Store.clearGame(); render(); };
+    rRow.append(resumeBtn, discardBtn);
+    banner.append(rRow);
+    card.append(banner);
+  }
+
+  const btnRow = el("div", { class: "row center", style: { marginTop: "24px", gap: "14px", flexWrap: "wrap" } });
+  const startBtn = el("button", { style: { padding: "15px 44px", fontSize: "17px" } }, "▶  شروع بازی جدید");
+  startBtn.onclick = () => {
+    initAudio(); sfx.click();
+    State.players = []; State.groups = []; State.useGroups = false;
+    State.scores = {}; State.stats = {}; State.turnHistory = []; State.turnQueue = [];
+    State.aiFailureCount = 0; State.aiOfflineFallback = false;
+    State.leaderboardSaved = false;
+    Store.clearGame();
+    setScreen("players");
+  };
+  const helpBtn = el("button", { class: "ghost", style: { padding: "15px 30px", fontSize: "15px" } }, "❓  چگونه بازی کنیم؟");
+  helpBtn.onclick = () => { sfx.click(); showHowToPlay(); };
+  btnRow.append(startBtn, helpBtn);
+  card.append(btnRow);
+
+  const feat = el("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: "10px", maxWidth: "640px", margin: "34px auto 0" } });
+  feat.innerHTML = `
+    <div class="pill" style="justify-content:center;">👥 تا ۱۲ بازیکن</div>
+    <div class="pill" style="justify-content:center;">🏆 گروهی یا انفرادی</div>
+    <div class="pill" style="justify-content:center;">🤖 هوش مصنوعی</div>
+    <div class="pill" style="justify-content:center;">📴 حالت آفلاین</div>
+  `;
+  card.append(feat);
+
+  const help = el("p", { class: "text-muted mt-3", style: { maxWidth: "560px", margin: "20px auto 0", lineHeight: "1.9" } });
+  help.innerHTML = `🎮 در هر نوبت یک نفر «راهنما» می‌شود و یک کلمه انتخاب می‌کند. بقیه با حدس حروف یا کل کلمه، آن را کشف می‌کنند.`;
+  card.append(help);
+  root.append(card);
+}
+
+/* ============================================================
+   PLAYERS
+   ============================================================ */
+function renderPlayers(root) {
+  root.append(topbar());
+  root.append(stepsBar(0, 4));
+  const card = el("div", { class: "card" });
+  card.innerHTML = `<h2>افزودن بازیکنان</h2><p class="sub">حداقل ${MIN_PLAYERS} و حداکثر ${MAX_PLAYERS} بازیکن.</p>`;
+
+  const inputRow = el("div", { class: "row" });
+  const input = el("input", { placeholder: "نام بازیکن…", maxlength: "16", autocomplete: "off", style: { flex: "1 1 180px" } });
+  const addBtn = el("button", {}, "＋ افزودن");
+  const aiBtn = el("button", { class: "gold" }, "🤖 بازیکن AI");
+  inputRow.append(input, addBtn, aiBtn);
+
+  const list = el("div", { class: "mt-2" });
+  const nav = el("div", { class: "row between mt-3" });
+  const backBtn = el("button", { class: "ghost" }, "‹  بازگشت");
+  const nextBtn = el("button", {}, "مرحلهٔ بعد  ›");
+  nav.append(backBtn, nextBtn);
+
+  card.append(inputRow, list, nav);
+  root.append(card);
+
+  const refresh = () => {
+    clear(list);
+    if (!State.players.length) {
+      list.append(el("div", { style: { textAlign: "center", color: "var(--dim)", padding: "22px 10px" } }, "هنوز بازیکنی اضافه نشده است"));
+    } else {
+      State.players.forEach((p, idx) => {
+        const item = el("div", { class: "player-item", style: { animationDelay: (idx * .04) + "s" } });
+        const nameWrap = el("div", { class: "name" });
+        nameWrap.innerHTML = p.isAI
+          ? `🤖 ${escapeHtml(p.name)} <span class="badge">AI · ${levelFa(p.level)}</span>`
+          : `👤 ${escapeHtml(p.name)}`;
+        const rm = el("button", { class: "remove", title: "حذف", "aria-label": "حذف بازیکن" }, "✕");
+        rm.onclick = () => {
+          State.players = State.players.filter(x => x.id !== p.id);
+          sfx.click(); refresh();
+        };
+        item.append(nameWrap, rm);
+        list.append(item);
+      });
+    }
+    nextBtn.disabled = State.players.length < MIN_PLAYERS;
+  };
+
+  const addPlayer = (name, isAI = false, level = "medium") => {
+    name = (name || "").trim();
+    if (!name) { toast("نام نمی‌تواند خالی باشد", "err"); return false; }
+    if (State.players.length >= MAX_PLAYERS) { toast(`حداکثر ${MAX_PLAYERS} بازیکن`, "err"); return false; }
+    if (State.players.some(p => p.name === name)) { toast("این نام تکراری است", "err"); return false; }
+    State.players.push({ id: uid(), name, isAI, level });
+    return true;
+  };
+
+  addBtn.onclick = () => { if (addPlayer(input.value)) { sfx.pop(); input.value = ""; input.focus(); refresh(); } };
+  input.addEventListener("keydown", e => { if (e.key === "Enter") addBtn.click(); });
+
+  aiBtn.onclick = () => {
+    sfx.click();
+    const bg = el("div", { class: "modal-bg" });
+    const m = el("div", { class: "card modal" });
+    m.innerHTML = `<h3>🤖 افزودن بازیکن هوش مصنوعی</h3>`;
+    const nameInp = el("input", { placeholder: "نام (مثلاً: ربات ۱)", value: `ربات ${State.players.filter(p => p.isAI).length + 1}`, style: { marginTop: "14px" } });
+    const lvlLbl = el("div", { class: "text-muted", style: { marginTop: "10px", textAlign: "right" } }, "سطح هوش:");
+    const lvlSel = el("select", { style: { marginTop: "6px" } });
+    lvlSel.innerHTML = `<option value="easy">🟢 مبتدی</option><option value="medium" selected>🟡 متوسط</option><option value="hard">🔴 حرفه‌ای</option>`;
+    const row = el("div", { class: "row center mt-2" });
+    const cancel = el("button", { class: "ghost" }, "انصراف");
+    const ok = el("button", { class: "gold" }, "افزودن");
+    cancel.onclick = () => bg.remove();
+    ok.onclick = () => { if (addPlayer(nameInp.value, true, lvlSel.value)) { sfx.pop(); bg.remove(); refresh(); } };
+    row.append(cancel, ok);
+    m.append(nameInp, lvlLbl, lvlSel, row);
+    bg.append(m); document.body.append(bg);
+    nameInp.focus(); nameInp.select();
+  };
+
+  backBtn.onclick = () => { sfx.click(); setScreen("splash"); };
+  nextBtn.onclick = () => { sfx.click(); setScreen("mode"); };
+  refresh();
+}
+
+/* ============================================================
+   MODE
+   ============================================================ */
+function renderMode(root) {
+  root.append(topbar());
+  root.append(stepsBar(1, 4));
+  const card = el("div", { class: "card" });
+  card.innerHTML = `<h2>حالت بازی</h2><p class="sub">انفرادی یا گروهی؟</p>`;
+
+  const canGroup = State.players.length >= MIN_GROUP_SIZE * 2;
+
+  const grid = el("div", { class: "grid-2" });
+  const b1 = el("button", { class: "ghost", style: { padding: "30px 20px", fontSize: "16px", lineHeight: "1.9" } });
+  b1.innerHTML = `<div style="font-size:36px;margin-bottom:6px;">🎮</div><b>انفرادی</b><br><span style="font-size:12px;color:#94a3b8;font-weight:500;">هر بازیکن نوبتی کلمه می‌دهد</span>`;
+  const b2 = el("button", { class: canGroup ? "" : "ghost", disabled: !canGroup, style: { padding: "30px 20px", fontSize: "16px", lineHeight: "1.9" } });
+  b2.innerHTML = `<div style="font-size:36px;margin-bottom:6px;">👥</div><b>گروهی</b><br><span style="font-size:12px;${canGroup ? "color:rgba(255,255,255,.8);" : "color:#94a3b8;"}font-weight:500;">${canGroup ? "تیم‌بندی و رقابت گروه‌ها" : `حداقل ${MIN_GROUP_SIZE * 2} بازیکن لازم است`}</span>`;
+  b1.onclick = () => { sfx.click(); State.useGroups = false; setScreen("settings"); };
+  b2.onclick = () => {
+    if (!canGroup) { toast(`حداقل ${MIN_GROUP_SIZE * 2} بازیکن لازم است`, "err"); return; }
+    sfx.click(); State.useGroups = true; setScreen("groups");
+  };
+  grid.append(b1, b2);
+
+  const back = el("div", { class: "row center mt-3" });
+  const bb = el("button", { class: "ghost" }, "‹  بازگشت");
+  bb.onclick = () => { sfx.click(); setScreen("players"); };
+  back.append(bb);
+
+  card.append(grid, back);
+  root.append(card);
+}
+
+/* ============================================================
+   GROUPS — باگ‌فیکس تغییر تعداد گروه
+   ============================================================ */
+function renderGroups(root) {
+  root.append(topbar());
+  root.append(stepsBar(2, 5));
+  const card = el("div", { class: "card" });
+  card.innerHTML = `<h2>ساخت گروه‌ها</h2><p class="sub">هر گروه باید حداقل ${MIN_GROUP_SIZE} بازیکن داشته باشد.</p>`;
+
+  const maxG = clamp(Math.floor(State.players.length / MIN_GROUP_SIZE), 2, MAX_GROUPS);
+  let groupCount = clamp(State.groups.length || 2, 2, maxG);
+  // نگاشت پایدار playerId → groupIndex
+  const assignments = {};
+  const existingAssignment = {};
+  State.groups.forEach((g, gi) => g.memberIds.forEach(id => existingAssignment[id] = gi));
+
+  State.players.forEach((p, i) => {
+    if (existingAssignment[p.id] != null && existingAssignment[p.id] < groupCount) assignments[p.id] = existingAssignment[p.id];
+    else assignments[p.id] = i % groupCount;
+  });
+
+  const countRow = el("div", { class: "row" });
+  countRow.append(el("label", { style: { fontWeight: "700" } }, "تعداد گروه‌ها:"));
+  const countSel = el("select", { style: { maxWidth: "120px" } });
+  for (let n = 2; n <= maxG; n++) countSel.append(el("option", { value: String(n) }, String(n)));
+  countSel.value = String(groupCount);
+  countRow.append(countSel);
+
+  const namesWrap = el("div", { class: "stack mt-2" });
+  const assignWrap = el("div", { class: "mt-3" });
+
+  const nav = el("div", { class: "row between mt-3" });
+  const backBtn = el("button", { class: "ghost" }, "‹  بازگشت");
+  const nextBtn = el("button", {}, "مرحلهٔ بعد  ›");
+  nav.append(backBtn, nextBtn);
+
+  const groupNames = [];
+  for (let i = 0; i < groupCount; i++) groupNames[i] = State.groups[i]?.name || "";
+
+  const refreshNames = () => {
+    clear(namesWrap);
+    for (let i = 0; i < groupCount; i++) {
+      const inp = el("input", { placeholder: `نام گروه ${i + 1}`, value: groupNames[i] || "", maxlength: "20" });
+      inp.addEventListener("input", () => { groupNames[i] = inp.value; });
+      namesWrap.append(inp);
+    }
+  };
+
+  const refreshAssign = () => {
+    clear(assignWrap);
+    assignWrap.append(el("h3", {}, "تخصیص بازیکنان به گروه‌ها"));
+    const groupBoxes = [];
+    for (let i = 0; i < groupCount; i++) {
+      const box = el("div", { class: "group-box" });
+      const head = el("div", { class: "group-head" });
+      head.append(
+        el("div", { class: "group-name" }, groupNames[i]?.trim() || `گروه ${i + 1}`),
+        el("div", { class: "count" }, "۰ عضو")
+      );
+      const count = head.querySelector(".count");
+      const membersWrap = el("div", { style: { display: "flex", flexWrap: "wrap", gap: "6px" } });
+      box.append(head, membersWrap);
+      groupBoxes.push({ membersWrap, count, idx: i });
+      assignWrap.append(box);
+    }
+
+    State.players.forEach(p => {
+      const gi = assignments[p.id];
+      if (gi == null || gi >= groupCount) return;
+      const chip = el("div", { class: "player-item", style: { padding: "8px 14px", marginBottom: "0", minWidth: "140px" } });
+      const nameEl = el("div", { class: "name", style: { fontSize: "13.5px" } });
+      nameEl.innerHTML = p.isAI ? `🤖 ${escapeHtml(p.name)}` : `👤 ${escapeHtml(p.name)}`;
+      const sel = el("select", { style: { maxWidth: "110px", padding: "6px 10px", fontSize: "13px", paddingLeft: "28px" } });
+      for (let i = 0; i < groupCount; i++) sel.append(el("option", { value: String(i) }, groupNames[i]?.trim() || `گروه ${i + 1}`));
+      sel.value = String(gi);
+      sel.onchange = () => { assignments[p.id] = parseInt(sel.value, 10); refreshAssign(); };
+      chip.append(nameEl, sel);
+      groupBoxes[gi]?.membersWrap.append(chip);
+    });
+
+    groupBoxes.forEach(b => {
+      const cnt = Object.values(assignments).filter(x => x === b.idx).length;
+      b.count.textContent = `${cnt} عضو`;
+      b.count.classList.toggle("bad", cnt < MIN_GROUP_SIZE);
+    });
+  };
+
+  countSel.onchange = () => {
+    const newCount = parseInt(countSel.value, 10);
+    // اصلاح groupNames برای تعداد جدید
+    const newNames = [];
+    for (let i = 0; i < newCount; i++) newNames[i] = groupNames[i] || "";
+    groupNames.length = 0;
+    newNames.forEach(n => groupNames.push(n));
+    groupCount = newCount;
+    // هر عضوی که الان خارج بازه است، به گروه 0 منتقل شود
+    State.players.forEach(p => {
+      if (assignments[p.id] == null || assignments[p.id] >= groupCount) assignments[p.id] = 0;
+    });
+    refreshNames(); refreshAssign();
+  };
+
+  nextBtn.onclick = () => {
+    const newGroups = [];
+    for (let i = 0; i < groupCount; i++) {
+      const n = (groupNames[i] || "").trim() || `گروه ${i + 1}`;
+      newGroups.push({ id: uid(), name: n, memberIds: [] });
+    }
+    let err = "";
+    for (const p of State.players) {
+      const gi = assignments[p.id];
+      if (gi == null || gi >= newGroups.length) { err = "همهٔ بازیکنان باید در گروه‌ها توزیع شوند"; break; }
+      newGroups[gi].memberIds.push(p.id);
+    }
+    if (!err) for (const g of newGroups) if (g.memberIds.length < MIN_GROUP_SIZE) { err = `گروه «${g.name}» باید حداقل ${MIN_GROUP_SIZE} عضو داشته باشد`; break; }
+    if (err) { toast(err, "err"); sfx.wrong(); return; }
+    State.groups = newGroups;
+    sfx.correct();
+    setScreen("settings");
+  };
+  backBtn.onclick = () => { sfx.click(); setScreen("mode"); };
+
+  card.append(countRow, namesWrap, assignWrap, nav);
+  root.append(card);
+  refreshNames(); refreshAssign();
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+function renderSettings(root) {
+  root.append(topbar());
+  root.append(stepsBar(State.useGroups ? 3 : 2, State.useGroups ? 5 : 4));
+  const card = el("div", { class: "card" });
+  card.innerHTML = `<h2>تنظیمات بازی</h2><p class="sub">یک‌بار تنظیم کن و شروع کن.</p>`;
+
+  const timeBlock = el("div");
+  timeBlock.append(el("h3", {}, "⏱  زمان هر نوبت"));
+  const timeBtns = el("div", { class: "topics" });
+  [[30, "۳۰ ثانیه"], [60, "۶۰ ثانیه"], [90, "۹۰ ثانیه"], [0, "بدون محدودیت"]].forEach(([t, lbl]) => {
+    const b = el("div", { class: "topic-chip" + (State.settings.time === t ? " active" : "") }, lbl);
+    b.onclick = () => {
+      State.settings.time = t; persistSettings(); sfx.click();
+      [...timeBtns.children].forEach(c => c.classList.remove("active"));
+      b.classList.add("active");
+    };
+    timeBtns.append(b);
+  });
+  timeBlock.append(timeBtns);
+
+  const diffBlock = el("div", { class: "mt-3" });
+  diffBlock.append(el("h3", {}, "🎚  سطح سختی"));
+  diffBlock.append(el("p", { class: "text-muted", style: { marginTop: "-4px", marginBottom: "10px" } }, "سختی روی تعداد حدس‌های مجاز و ضریب امتیاز اثر می‌گذارد."));
+  const diffBtns = el("div", { class: "topics" });
+  [["easy", "🟢 آسان"], ["medium", "🟡 متوسط"], ["hard", "🔴 سخت"]].forEach(([k, lbl]) => {
+    const b = el("div", { class: "topic-chip" + (State.settings.difficulty === k ? " active" : "") }, lbl);
+    b.onclick = () => {
+      State.settings.difficulty = k; persistSettings(); sfx.click();
+      [...diffBtns.children].forEach(c => c.classList.remove("active"));
+      b.classList.add("active");
+    };
+    diffBtns.append(b);
+  });
+  diffBlock.append(diffBtns);
+
+  const roundsBlock = el("div", { class: "mt-3" });
+  roundsBlock.append(el("h3", {}, "🔁  تعداد دورها"));
+  const roundsBtns = el("div", { class: "topics" });
+  [1, 2, 3, 5].forEach(r => {
+    const b = el("div", { class: "topic-chip" + (State.settings.rounds === r ? " active" : "") },
+      r === 1 ? "۱ دور" : (r === 2 ? "۲ دور" : r === 3 ? "۳ دور" : "۵ دور"));
+    b.onclick = () => {
+      State.settings.rounds = r; persistSettings(); sfx.click();
+      [...roundsBtns.children].forEach(c => c.classList.remove("active"));
+      b.classList.add("active");
+    };
+    roundsBtns.append(b);
+  });
+  roundsBlock.append(roundsBtns);
+
+  const aiBlock = el("div", { class: "mt-3" });
+  aiBlock.innerHTML = `<h3>🤖  هوش مصنوعی (Gemini)</h3>
+    <p class="text-muted" style="margin-bottom:12px;">اگر AI غیرفعال یا آفلاین باشد، از بانک کلمات محلی استفاده می‌شود.</p>`;
+  const aiRow = el("div", { class: "row" });
+
+  const aiToggle = el("button", { class: State.settings.aiEnabled ? "" : "ghost" },
+    State.settings.aiEnabled ? "🟢  فعال" : "⚪  غیرفعال");
+  aiToggle.onclick = () => {
+    State.settings.aiEnabled = !State.settings.aiEnabled;
+    persistSettings();
+    aiToggle.className = State.settings.aiEnabled ? "" : "ghost";
+    aiToggle.textContent = State.settings.aiEnabled ? "🟢  فعال" : "⚪  غیرفعال";
+    sfx.click();
+  };
+
+  const offlineToggle = el("button", { class: State.settings.offlineMode ? "gold" : "ghost" },
+    State.settings.offlineMode ? "📴  آفلاین" : "🌐  آنلاین");
+  offlineToggle.onclick = () => {
+    State.settings.offlineMode = !State.settings.offlineMode;
+    persistSettings();
+    offlineToggle.className = State.settings.offlineMode ? "gold" : "ghost";
+    offlineToggle.textContent = State.settings.offlineMode ? "📴  آفلاین" : "🌐  آنلاین";
+    sfx.click();
+  };
+
+  const testBtn = el("button", { class: "gold sm" }, "تست اتصال");
+  const testStatus = el("span", { class: "text-muted", style: { flex: "1 1 100%", marginTop: "8px" } }, "");
+  testBtn.onclick = async () => {
+    testStatus.textContent = "⏳ در حال تست…";
+    testStatus.style.color = "var(--muted)";
+    testBtn.disabled = true;
+    const t0 = performance.now();
+    try {
+      State.aiOfflineFallback = false;
+      const r = await callAI("فقط کلمهٔ «سلام» را بنویس.", { maxTokens: 16 });
+      const ms = Math.round(performance.now() - t0);
+      testStatus.innerHTML = `✅ اتصال برقرار — مدل <b>${escapeHtml(_workingModel || "?")}</b> — ${ms}ms`;
+      testStatus.style.color = "#86efac";
+      sfx.correct();
+    } catch (e) {
+      testStatus.innerHTML = `❌ خطا: ${escapeHtml((e.message || "").slice(0, 160))}`;
+      testStatus.style.color = "#fca5a5";
+      sfx.wrong();
+    } finally { testBtn.disabled = false; }
+  };
+  aiRow.append(aiToggle, offlineToggle, testBtn, testStatus);
+  aiBlock.append(aiRow);
+
+  const hapticsRow = el("div", { class: "row mt-2" });
+  hapticsRow.append(el("span", { style: { fontWeight: "700", fontSize: "14px" } }, "📳 لرزش:"));
+  const hapticsBtn = el("button", { class: "sm " + (State.settings.hapticsOn ? "" : "ghost") },
+    State.settings.hapticsOn ? "روشن" : "خاموش");
+  hapticsBtn.onclick = () => {
+    State.settings.hapticsOn = !State.settings.hapticsOn;
+    persistSettings();
+    hapticsBtn.className = "sm " + (State.settings.hapticsOn ? "" : "ghost");
+    hapticsBtn.textContent = State.settings.hapticsOn ? "روشن" : "خاموش";
+    if (State.settings.hapticsOn) vibrate(40);
+  };
+  hapticsRow.append(hapticsBtn);
+  aiBlock.append(hapticsRow);
+
+  const adv = el("details", { class: "advanced" });
+  adv.append(el("summary", {}, "تنظیمات پیشرفته (کلید API)"));
+  const advBody = el("div", { class: "adv-body" });
+  advBody.append(el("p", { style: { marginBottom: "10px", lineHeight: "1.9" } },
+    "برای فعال‌سازی هوش مصنوعی، کلید Gemini API خودت را اینجا وارد کن (رایگان از Google AI Studio). این کلید فقط در همین مرورگر ذخیره می‌شود و به هیچ سروری جز Google ارسال نمی‌شود. بدون کلید، بازی به‌طور کامل و آفلاین با بانک کلمات محلی کار می‌کند."));
+  const keyInput = el("input", {
+    type: "password", placeholder: "AIza...", value: State.settings.apiKey,
+    autocomplete: "off", spellcheck: "false", dir: "ltr",
+    style: { textAlign: "left", fontFamily: "monospace", fontSize: "13px" }
+  });
+  const keyRow = el("div", { class: "row mt-1" });
+  const saveKeyBtn = el("button", { class: "sm" }, "ذخیره");
+  const resetKeyBtn = el("button", { class: "ghost sm" }, "پاک کردن کلید");
+  saveKeyBtn.onclick = () => {
+    const v = keyInput.value.trim();
+    if (v && v.length < 10) { toast("کلید واردشده معتبر به نظر نمی‌رسد", "err"); return; }
+    State.settings.apiKey = v; persistSettings(); _workingModel = null;
+    State.aiFailureCount = 0; State.aiOfflineFallback = false;
+    toast(v ? "کلید ذخیره شد" : "کلید حذف شد — حالت آفلاین فعال است", v ? "ok" : "info");
+  };
+  resetKeyBtn.onclick = () => { State.settings.apiKey = ""; keyInput.value = ""; persistSettings(); _workingModel = null; toast("کلید پاک شد", "info"); };
+  keyRow.append(saveKeyBtn, resetKeyBtn);
+  advBody.append(keyInput, keyRow);
+  adv.append(advBody);
+  aiBlock.append(adv);
+
+  const nav = el("div", { class: "row between mt-3" });
+  const backBtn = el("button", { class: "ghost" }, "‹  بازگشت");
+  const startBtn = el("button", { style: { padding: "14px 36px", fontSize: "16px" } }, "🚀  شروع بازی");
+  nav.append(backBtn, startBtn);
+  backBtn.onclick = () => { sfx.click(); setScreen(State.useGroups ? "groups" : "mode"); };
+  startBtn.onclick = () => { sfx.click(); startGame(); };
+
+  card.append(timeBlock, diffBlock, roundsBlock, aiBlock, nav);
+  root.append(card);
+}
+
+/* ============================================================
+   GAME START
+   ============================================================ */
+function startGame() {
+  State.currentRound = 1;
+  State.turnIdx = 0;
+  State.turnHistory = [];
+  State.scores = {};
+  State.stats = {};
+  State.gameStartedAt = Date.now();
+  State.leaderboardSaved = false;
+
+  State.players.forEach(p => {
+    State.scores[p.id] = 0;
+    State.stats[p.id] = { wins: 0, losses: 0 };
+  });
+  if (State.useGroups) {
+    State.groups.forEach(g => {
+      State.scores["g_" + g.id] = 0;
+      State.stats["g_" + g.id] = { wins: 0, losses: 0 };
+    });
+  }
+
+  buildTurnQueue();
+  if (!State.turnQueue.length) { toast("نمی‌توان بازی را شروع کرد", "err"); setScreen("splash"); return; }
+  nextTurn();
+}
+
+function buildTurnQueue() {
+  State.turnQueue = [];
+  const R = State.settings.rounds;
+
+  if (State.useGroups) {
+    const giverPtr = new Array(State.groups.length).fill(0);
+    for (let r = 0; r < R; r++) {
+      for (let i = 0; i < State.groups.length; i++) {
+        const giverGroup = State.groups[i];
+        const giverId = giverGroup.memberIds[giverPtr[i] % giverGroup.memberIds.length];
+        giverPtr[i]++;
+
+        const guesserGroups = State.groups.filter((_, j) => j !== i);
+        const guesserIds = [];
+        guesserGroups.forEach(gg => gg.memberIds.forEach(id => guesserIds.push(id)));
+
+        State.turnQueue.push({
+          round: r + 1,
+          giverId,
+          giverGroupId: giverGroup.id,
+          guesserIds,
+          guesserGroupIds: guesserGroups.map(g => g.id),
+          guesserLabel: guesserGroups.map(g => g.name).join(" + ")
+        });
+      }
+    }
+  } else {
+    const ps = State.players;
+    for (let r = 0; r < R; r++) {
+      for (let i = 0; i < ps.length; i++) {
+        const giver = ps[i];
+        const others = ps.filter(p => p.id !== giver.id);
+        State.turnQueue.push({
+          round: r + 1,
+          giverId: giver.id,
+          guesserIds: others.map(o => o.id),
+          guesserLabel: others.map(o => o.name).join("، ")
+        });
+      }
+    }
+  }
+}
+
+/* ============================================================
+   NEXT TURN
+   ============================================================ */
+function nextTurn() {
+  if (State.turnIdx >= State.turnQueue.length) { setScreen("end"); return; }
+
+  // ابطال درخواست‌های AI نوبت قبل
+  abortCurrentTurn();
+  State.turnAbort = new AbortController();
+
+  State.turnToken++;
+  State.word = "";
+  State.topic = "";
+  State.revealed = [];
+  State.hintedIdx = [];
+  State.wrongLetters = [];
+  State.wrongWords = [];
+  State.correctLetters = new Set();
+  State.hintsUsed = 0;
+  State.timeLeft = State.settings.time;
+  State.turnActive = false;
+  State.turnResolved = false;
+  State.paused = false;
+  State.aiTurn = false;
+  if (State.timerId) { clearInterval(State.timerId); State.timerId = null; }
+
+  const turn = State.turnQueue[State.turnIdx];
+  State.currentTurn = turn;
+  State.giverId = turn.giverId;
+  State.guesserIds = turn.guesserIds;
+  State.guesserLabel = turn.guesserLabel;
+  State.currentRound = turn.round || 1;
+
+  // آیا در این نوبت AI حدس‌زننده هست؟
+  State.aiTurn = turn.guesserIds.some(id => getPlayer(id)?.isAI);
+
+  setScreen("handoffGiver");
+}
+
+/* ============================================================
+   HANDOFF GIVER
+   ============================================================ */
+function renderHandoffGiver(root) {
+  root.append(topbar());
+  const giver = getPlayer(State.giverId);
+  const card = el("div", { class: "card handoff" });
+  const isAI = giver?.isAI;
+
+  card.innerHTML = `
+    <div class="emoji">📱</div>
+    <div class="big">گوشی را به دست این نفر بده:</div>
+    <div class="who">${escapeHtml(giver?.name || "؟")}${isAI ? " 🤖" : ""}</div>
+    <div class="big" style="font-size:15px;color:#94a3b8;font-weight:500;">
+      ${isAI ? "هوش مصنوعی خودش موضوع و کلمه را انتخاب می‌کند…" : "این نفر باید یک موضوع و یک کلمه انتخاب کند."}
+    </div>
+  `;
+
+  if (!isAI) {
+    const btnRow = el("div", { class: "row center mt-3" });
+    const btn = el("button", { style: { padding: "14px 44px", fontSize: "16px" } }, "آماده‌ام  ✓");
+    btn.onclick = () => { sfx.click(); setScreen("wordChoice"); };
+    btnRow.append(btn);
+    card.append(btnRow);
+  } else {
+    // AI giver: سریع شروع کن
+    const statusRow = el("div", { class: "ai-think mt-3" });
+    statusRow.innerHTML = `<span>آماده‌سازی خودکار</span><span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
+    card.append(statusRow);
+
+    const token = State.turnToken;
+    const signal = State.turnAbort.signal;
+
+    (async () => {
+      try {
+        // بدون تأخیر مصنوعی
+        let topic = null, word = null;
+
+        if (AI_AVAILABLE()) {
+          // درخواست موازی
+          const [t, w] = await Promise.all([
+            aiSuggestTopic(signal).catch(() => null),
+            (async () => null)()
+          ]);
+          topic = t;
+        }
+
+        if (token !== State.turnToken || signal.aborted) return;
+
+        if (!topic) topic = getRandomTopic();
+        State.topic = topic;
+
+        if (AI_AVAILABLE()) {
+          word = await aiSuggestWord(topic, signal).catch(() => null);
+        }
+        if (token !== State.turnToken || signal.aborted) return;
+
+        if (!word) word = getWordFromBank(topic);
+        State.word = word;
+
+        sfx.aiPing();
+        // مستقیم به handoffGuess نمی‌رویم چون AI خودش حدس می‌زند
+        startGuessPhase();
+      } catch (e) {
+        if (token !== State.turnToken) return;
+        console.warn("AI auto-turn error:", e);
+        State.topic = State.topic || getRandomTopic();
+        State.word = State.word || getWordFromBank(State.topic);
+        startGuessPhase();
+      }
+    })();
+  }
+
+  root.append(card);
+}
+
+/* ============================================================
+   WORD CHOICE
+   ============================================================ */
+function renderWordChoice(root) {
+  root.append(topbar());
+  const giver = getPlayer(State.giverId);
+  const card = el("div", { class: "card" });
+  card.innerHTML = `<h2>انتخاب موضوع و کلمه</h2><p class="sub">${escapeHtml(giver.name)} عزیز، موضوع را انتخاب کن و یک کلمه در آن بنویس.</p>`;
+
+  // باگ‌فیکس: selectedTopic از State گرفته شود ولی به customTopic گره نخورد
+  let selectedTopic = State.topic || "";
+  let customTopicValue = "";
+
+  const topicLabel = el("h3", {}, "📌  موضوع:");
+  const topicGrid = el("div", { class: "topics" });
+  TOPICS.forEach(t => {
+    const chip = el("div", { class: "topic-chip" + (selectedTopic === t ? " active" : "") }, t);
+    chip.onclick = () => {
+      selectedTopic = t;
+      customTopicValue = "";
+      customTopic.value = "";
+      sfx.pop();
+      [...topicGrid.children].forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+    };
+    topicGrid.append(chip);
+  });
+  const customTopic = el("input", { placeholder: "یا موضوع دلخواه بنویس…" });
+  customTopic.addEventListener("input", () => {
+    customTopicValue = customTopic.value.trim();
+    if (customTopicValue) {
+      // پاک کردن active topic chips
+      selectedTopic = "";
+      [...topicGrid.children].forEach(c => c.classList.remove("active"));
+    }
+  });
+
+  const aiRow = el("div", { class: "row mt-1" });
+  if (AI_AVAILABLE()) {
+    const aiTopicBtn = el("button", { class: "gold sm" }, "🤖  پیشنهاد موضوع");
+    const aiWordBtn = el("button", { class: "gold sm" }, "🤖  پیشنهاد کلمه");
+    aiTopicBtn.onclick = async () => {
+      aiTopicBtn.disabled = true;
+      const old = aiTopicBtn.textContent; aiTopicBtn.textContent = "…";
+      const t = await aiSuggestTopic();
+      aiTopicBtn.disabled = false; aiTopicBtn.textContent = old;
+      if (!t) { toast("AI پاسخ نداد — از بانک محلی استفاده کن", "warn"); return; }
+      selectedTopic = t;
+      customTopicValue = "";
+      customTopic.value = t;
+      [...topicGrid.children].forEach(c => c.classList.remove("active"));
+      toast(`موضوع پیشنهادی: ${t}`, "ai");
+    };
+    aiWordBtn.onclick = async () => {
+      const topicNow = (customTopicValue || selectedTopic).trim();
+      if (!topicNow) { toast("اول یک موضوع انتخاب کن", "err"); return; }
+      aiWordBtn.disabled = true;
+      const old = aiWordBtn.textContent; aiWordBtn.textContent = "…";
+      const w = await aiSuggestWord(topicNow);
+      aiWordBtn.disabled = false; aiWordBtn.textContent = old;
+      if (!w) { toast("AI نتوانست کلمه بسازد", "err"); return; }
+      wordInp.value = w;
+      toast(`پیشنهاد AI: «${w}»`, "ai");
+    };
+    aiRow.append(aiTopicBtn, aiWordBtn);
+  }
+
+  const wordLabel = el("h3", { style: { marginTop: "18px" } }, "✏️  کلمه (فقط حروف فارسی، ۲ تا ۱۵ حرف):");
+  const wordInp = el("input", {
+    placeholder: "کلمه را اینجا بنویس…",
+    maxlength: "20", autocomplete: "off", autocapitalize: "off", spellcheck: "false"
+  });
+  wordInp.addEventListener("input", () => {
+    const before = wordInp.value;
+    const after = before.replace(/[^\u0600-\u06FF\u200C]/g, "");
+    if (before !== after) wordInp.value = after;
+  });
+  wordInp.addEventListener("keydown", e => { if (e.key === "Enter") confirmBtn.click(); });
+
+  const backBtn = el("button", { class: "ghost" }, "‹  انصراف");
+  const confirmBtn = el("button", {}, "تأیید و شروع حدس  ✓");
+  const nav = el("div", { class: "row between mt-3" });
+  nav.append(backBtn, confirmBtn);
+
+  backBtn.onclick = () => { sfx.click(); setScreen("handoffGiver"); };
+  confirmBtn.onclick = () => {
+    const topic = (customTopicValue || selectedTopic).trim();
+    const word = wordInp.value.trim();
+    if (!topic) { toast("موضوع را مشخص کن", "err"); sfx.wrong(); return; }
+    if (!PERSIAN_WORD_RE.test(word)) { toast("کلمه باید فقط حروف فارسی و بین ۲ تا ۱۵ حرف باشد", "err"); sfx.wrong(); return; }
+    State.topic = topic;
+    State.word = word;
+    sfx.correct();
+    setScreen("handoffGuess");
+  };
+
+  card.append(topicLabel, topicGrid, customTopic, aiRow, wordLabel, wordInp, nav);
+  root.append(card);
+  setTimeout(() => wordInp.focus(), 250);
+}
+
+/* ============================================================
+   HANDOFF GUESS
+   ============================================================ */
+function renderHandoffGuess(root) {
+  root.append(topbar());
+  const card = el("div", { class: "card handoff" });
+  const aiGuessers = State.guesserIds.filter(id => getPlayer(id)?.isAI);
+
+  card.innerHTML = `
+    <div class="emoji">🙈</div>
+    <div class="big">گوشی را به حدس‌زننده‌ها بده:</div>
+    <div class="who">${escapeHtml(State.guesserLabel)}</div>
+    <p class="sub" style="margin-top:10px;">موضوع: <b style="color:#a5f3fc;">${escapeHtml(State.topic)}</b></p>
+    <p class="text-muted">${State.word.length} حرف</p>
+    ${aiGuessers.length ? `<p class="text-muted" style="margin-top:8px;color:#fcd34d;">🤖 توجه: در این نوبت AI حدس‌زننده است — شما فقط تماشا می‌کنید.</p>` : ""}
+  `;
+  const row = el("div", { class: "row center mt-3" });
+  const btn = el("button", { style: { padding: "14px 44px", fontSize: "16px" } }, "شروع حدس  ▶");
+  btn.onclick = () => { sfx.click(); startGuessPhase(); };
+  row.append(btn);
+  card.append(row);
+  root.append(card);
+}
+
+/* ============================================================
+   START GUESS PHASE
+   ============================================================ */
+function startGuessPhase() {
+  State.revealed = new Array(State.word.length).fill(false);
+  State.hintedIdx = [];
+  State.wrongLetters = [];
+  State.wrongWords = [];
+  State.correctLetters = new Set();
+  State.hintsUsed = 0;
+  State.timeLeft = State.settings.time;
+  State.turnActive = true;
+  State.turnResolved = false;
+  State.paused = false;
+
+  const d = State.settings.difficulty;
+  if (d === "easy") {
+    State.maxWrongLetters = State.word.length + 2;
+    State.maxWrongWords = 3;
+  } else if (d === "hard") {
+    State.maxWrongLetters = Math.max(3, State.word.length - 2);
+    State.maxWrongWords = 1;
+  } else {
+    State.maxWrongLetters = State.word.length;
+    State.maxWrongWords = 2;
+  }
+
+  setScreen("guess");
+  startTimer();
+
+  // AI guesser loop
+  const aiGuessers = State.guesserIds.filter(id => getPlayer(id)?.isAI);
+  const humanGuessers = State.guesserIds.filter(id => !getPlayer(id)?.isAI);
+
+  if (aiGuessers.length > 0) {
+    const token = State.turnToken;
+    setTimeout(() => {
+      if (AI_AVAILABLE()) aiGuessLoop(token);
+      else randomGuessLoop(token);
+    }, humanGuessers.length ? 1500 : 500);
+  }
+}
+
+/* ============================================================
+   TIMER
+   ============================================================ */
+function startTimer() {
+  if (State.timerId) clearInterval(State.timerId);
+  if (State.settings.time === 0) { updateTimerUI(); return; }
+
+  State.timeStartedAt = Date.now();
+  State.timerId = setInterval(() => {
+    if (!State.turnActive || State.turnResolved || State.paused) return;
+    const elapsed = Math.floor((Date.now() - State.timeStartedAt) / 1000);
+    const newLeft = Math.max(0, State.settings.time - elapsed);
+    if (newLeft !== State.timeLeft) {
+      State.timeLeft = newLeft;
+      updateTimerUI();
+      if (State.timeLeft <= 5 && State.timeLeft > 0) { sfx.tick(); vibrate(15); }
+    }
+    if (State.timeLeft <= 0) {
+      clearInterval(State.timerId); State.timerId = null;
+      scheduleTurnEnd(false, "زمان تمام شد!");
+    }
+  }, 500);
+}
+
+function updateTimerUI() {
+  const wrap = $(".timer-wrap");
+  if (!wrap) return;
+  const txt = wrap.querySelector(".timer-text .num");
+  const ring = wrap.querySelector(".ring-fg");
+  if (!txt || !ring) return;
+
+  const total = State.settings.time || 1;
+  const unlimited = State.settings.time === 0;
+  const pct = unlimited ? 1 : clamp(State.timeLeft / total, 0, 1);
+  const R = 42, C = 2 * Math.PI * R;
+  ring.style.strokeDasharray = C;
+  ring.style.strokeDashoffset = C * (1 - pct);
+
+  if (unlimited) { txt.textContent = "∞"; wrap.classList.remove("warn"); }
+  else { txt.textContent = Math.max(0, State.timeLeft); wrap.classList.toggle("warn", State.timeLeft <= 10); }
+}
+
+/* ============================================================
+   PAUSE
+   ============================================================ */
+function pauseGame() {
+  if (!State.turnActive || State.turnResolved) return;
+  State.paused = true;
+  // ابطال درخواست‌های AI در حال جریان
+  // (اما نه به‌طور دائمی — با resume یک controller جدید می‌سازیم)
+
+  const overlay = el("div", { class: "pause-overlay" });
+  const card = el("div", { class: "card", style: { maxWidth: "400px", textAlign: "center" } });
+  card.innerHTML = `
+    <div style="font-size:64px;margin-bottom:8px;">⏸</div>
+    <h2>بازی متوقف شد</h2>
+    <p class="sub">برای ادامه دکمهٔ زیر را بزن.</p>
+  `;
+  const row = el("div", { class: "row center" });
+  const resumeBtn = el("button", { class: "green" }, "▶  ادامه");
+  const quitBtn = el("button", { class: "danger" }, "خروج از بازی");
+  resumeBtn.onclick = () => {
+    sfx.click();
+    State.paused = false;
+    State.timeStartedAt = Date.now() - (State.settings.time - State.timeLeft) * 1000;
+    overlay.remove();
+  };
+  quitBtn.onclick = () => {
+    sfx.click();
+    overlay.remove();
+    abortCurrentTurn();
+    Store.clearGame();
+    State.turnQueue = []; State.turnHistory = [];
+    State.paused = false; State.turnActive = false;
+    setScreen("splash");
+  };
+  row.append(resumeBtn, quitBtn);
+  card.append(row);
+  overlay.append(card);
+  document.body.append(overlay);
+}
+
+/* ============================================================
+   GUESS SCREEN
+   ============================================================ */
+function renderGuess(root) {
+  root.append(topbar({ pause: true, history: true }));
+  const card = el("div", { class: "card" });
+
+  // Progress
+  const total = State.turnQueue.length;
+  const pct = total ? ((State.turnIdx + 1) / total) * 100 : 0;
+  const pb = el("div", { class: "progress-bar" });
+  pb.innerHTML = `<div class="fill" style="width:${pct}%"></div>`;
+  card.append(pb);
+
+  const header = el("div", { class: "row between", style: { flexWrap: "wrap", gap: "8px" } });
+  header.append(
+    el("div", { class: "turn-badge" }, `دور ${State.currentRound} · نوبت ${State.turnIdx + 1} از ${total}`),
+    el("div", { class: "pill cyan", html: `موضوع: <b>${escapeHtml(State.topic)}</b>` }),
+    el("div", { class: "pill gold", html: `حدس‌زننده: <b>${escapeHtml(State.guesserLabel)}</b>` })
+  );
+  card.append(header);
+
+  // AI banner
+  if (State.aiTurn) {
+    const banner = el("div", { class: "ai-play-banner" });
+    banner.innerHTML = `
+      <span class="icon">🤖</span>
+      <div>
+        <div class="txt">هوش مصنوعی در حال حدس زدن است</div>
+        <div class="status" id="ai-status">آماده‌سازی…</div>
+      </div>
+    `;
+    card.append(banner);
+  }
+
+  // Live scores
+  const scoresWrap = el("div", { class: "live-scores" });
+  if (State.useGroups) {
+    State.groups.forEach(g => {
+      const k = "g_" + g.id;
+      const chip = el("div", { class: "chip" });
+      chip.innerHTML = `👥 ${escapeHtml(g.name)} <span class="num">${State.scores[k] || 0}</span>`;
+      scoresWrap.append(chip);
+    });
+  } else {
+    State.players.forEach(p => {
+      const chip = el("div", { class: "chip" });
+      chip.innerHTML = `${p.isAI ? "🤖" : "👤"} ${escapeHtml(p.name)} <span class="num">${State.scores[p.id] || 0}</span>`;
+      scoresWrap.append(chip);
+    });
+  }
+  card.append(scoresWrap);
+
+  const timerWrap = el("div", { class: "timer-wrap" });
+  timerWrap.innerHTML = `
+    <svg class="timer-svg" viewBox="0 0 96 96" aria-hidden="true">
+      <defs>
+        <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <circle class="ring-bg" cx="48" cy="48" r="42"/>
+      <circle class="ring-fg" cx="48" cy="48" r="42"/>
+    </svg>
+    <div class="timer-text">
+      <span class="num">${State.settings.time === 0 ? "∞" : State.timeLeft}</span>
+      <span class="lbl">ثانیه</span>
+    </div>
+  `;
+  card.append(timerWrap);
+
+  const slots = el("div", { class: "slots" });
+  for (let i = 0; i < State.word.length; i++) {
+    const slot = el("div", { class: "slot" + (State.revealed[i] ? " revealed" : ""), "data-i": i });
+    if (State.revealed[i]) slot.textContent = State.word[i];
+    slots.append(slot);
+  }
+  card.append(slots);
+
+  const wrongRow = el("div", { class: "wrong-row" });
+  State.wrongLetters.forEach(l => wrongRow.append(el("div", { class: "wrong-letter" }, l)));
+  State.wrongWords.forEach(w => wrongRow.append(el("div", { class: "wrong-word" }, w)));
+  card.append(wrongRow);
+
+  const counters = el("div", { class: "row center", style: { gap: "10px", flexWrap: "wrap", marginTop: "4px" } });
+  counters.append(
+    el("div", { class: "pill red", id: "cntLetter" }, `حرف غلط: ${State.wrongLetters.length} / ${State.maxWrongLetters}`),
+    el("div", { class: "pill red", id: "cntWord" }, `کلمهٔ غلط: ${State.wrongWords.length} / ${State.maxWrongWords}`),
+    el("div", { class: "pill purple", id: "cntHint" }, `راهنما: ${State.hintsUsed} / ${MAX_HINTS}`)
+  );
+  card.append(counters);
+
+  // Kontrol
+  const controlsWrap = el("div", { class: State.aiTurn ? "controls-locked" : "" });
+
+  const hintRow = el("div", { class: "hint-row" });
+  const hintBtn = el("button", { class: "gold sm", disabled: State.hintsUsed >= MAX_HINTS || !State.turnActive || State.turnResolved || State.aiTurn }, `💡  راهنما (−${HINT_PENALTY} امتیاز)`);
+  const passBtn = el("button", { class: "danger sm", disabled: !State.turnActive || State.turnResolved || State.aiTurn }, "🏳️  انصراف از نوبت");
+  hintBtn.onclick = () => useHint();
+  passBtn.onclick = () => {
+    if (!State.turnActive || State.turnResolved || State.aiTurn) return;
+    showModal({
+      title: "انصراف از نوبت؟",
+      bodyHtml: "با این کار نوبت به پایان می‌رسد و امتیازی نمی‌گیرید.",
+      confirmLabel: "بله",
+      danger: true,
+      onConfirm: () => scheduleTurnEnd(false, "انصراف داده شد!", 200)
+    });
+  };
+  hintRow.append(hintBtn, passBtn);
+  controlsWrap.append(hintRow);
+
+  const alphaLabel = el("h3", { style: { marginTop: "18px", textAlign: "center" } }, "الفبا — روی حرف بزن:");
+  const alphaWrap = el("div", { class: "alphabet" });
+  ALPHABET.forEach(l => {
+    const b = el("button", { class: "alpha-btn", "data-letter": l }, l);
+    if (State.correctLetters.has(l)) { b.classList.add("correct"); b.disabled = true; }
+    else if (State.wrongLetters.includes(l)) { b.classList.add("wrong"); b.disabled = true; }
+    b.onclick = () => guessLetter(l, false);
+    alphaWrap.append(b);
+  });
+  controlsWrap.append(alphaLabel, alphaWrap);
+
+  const fullTitle = el("h3", { style: { marginTop: "22px", textAlign: "center" } }, "یا کل کلمه را حدس بزن:");
+  const fullWord = el("div", { class: "full-word" });
+  const wordInputs = [];
+  for (let i = 0; i < State.word.length; i++) {
+    const inp = el("input", {
+      maxlength: "1", "data-i": i, dir: "rtl", inputmode: "text", autocomplete: "off"
+    });
+    inp.addEventListener("input", () => {
+      inp.value = inp.value.replace(/[^\u0600-\u06FF\u200C]/g, "");
+      if (inp.value && i < wordInputs.length - 1) wordInputs[i + 1].focus();
+    });
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Backspace" && !inp.value && i > 0) wordInputs[i - 1].focus();
+      else if (e.key === "Enter") submitFullWord();
+      else if (e.key === "ArrowLeft" && i < wordInputs.length - 1) wordInputs[i + 1].focus();
+      else if (e.key === "ArrowRight" && i > 0) wordInputs[i - 1].focus();
+    });
+    inp.addEventListener("paste", e => {
+      e.preventDefault();
+      const txt = (e.clipboardData.getData("text") || "").replace(/[^\u0600-\u06FF\u200C]/g, "");
+      const limit = Math.min(txt.length, wordInputs.length - i);
+      for (let k = 0; k < limit; k++) wordInputs[i + k].value = txt[k];
+      wordInputs[Math.min(i + limit, wordInputs.length - 1)].focus();
+      if (txt.length > limit) toast("بخشی از متن پیست شد (طول کلمه محدود است)", "warn");
+    });
+    wordInputs.push(inp);
+    fullWord.append(inp);
+  }
+  const submitRow = el("div", { class: "row center", style: { marginTop: "12px" } });
+  const submitBtn = el("button", {}, "حدس کل کلمه  ✓");
+  submitBtn.onclick = submitFullWord;
+  submitRow.append(submitBtn);
+  controlsWrap.append(fullTitle, fullWord, submitRow);
+
+  card.append(controlsWrap);
+
+  function submitFullWord() {
+    if (!State.turnActive || State.turnResolved || State.aiTurn) return;
+    const guess = wordInputs.map(i => i.value).join("");
+    if (guess.length !== State.word.length) { toast("تعداد حروف کافی نیست", "err"); sfx.wrong(); return; }
+    if (!PERSIAN_WORD_RE.test(guess)) { toast("فقط حروف فارسی", "err"); return; }
+    wordInputs.forEach(i => i.value = "");
+    guessFullWord(guess, false);
+  }
+
+  root.append(card);
+  updateTimerUI();
+}
+
+/* ============================================================
+   HINT
+   ============================================================ */
+function useHint() {
+  if (!State.turnActive || State.turnResolved || State.paused || State.aiTurn) return;
+  if (State.hintsUsed >= MAX_HINTS) { toast("سهمیهٔ راهنما تمام شد", "err"); return; }
+
+  const hidden = State.word.split("").map((_, i) => i).filter(i => !State.revealed[i]);
+  if (!hidden.length) return;
+
+  State.hintsUsed++;
+  const idx = randPick(hidden);
+  const letter = State.word[idx];
+
+  for (let i = 0; i < State.word.length; i++) {
+    if (State.word[i] === letter) {
+      State.revealed[i] = true;
+      if (!State.hintedIdx.includes(i)) State.hintedIdx.push(i);
+    }
+  }
+  State.correctLetters.add(letter);
+
+  for (let i = 0; i < State.word.length; i++) {
+    if (State.revealed[i]) {
+      const slot = $(`.slot[data-i="${i}"]`);
+      if (slot) {
+        slot.textContent = State.word[i];
+        slot.classList.add("revealed");
+        if (State.hintedIdx.includes(i)) slot.classList.add("hinted");
+      }
+    }
+  }
+  const ab = $(`.alpha-btn[data-letter="${letter}"]`);
+  if (ab) { ab.classList.add("correct"); ab.disabled = true; }
+
+  const cnt = $("#cntHint");
+  if (cnt) cnt.textContent = `راهنما: ${State.hintsUsed} / ${MAX_HINTS}`;
+  const hintBtn = $(".hint-row .gold");
+  if (hintBtn) hintBtn.disabled = State.hintsUsed >= MAX_HINTS;
+
+  sfx.hint();
+  vibrate([20, 30, 20]);
+  toast(`💡 حرف «${letter}» لو رفت (−${HINT_PENALTY} امتیاز)`, "warn");
+
+  if (State.revealed.every(r => r)) scheduleTurnEnd(true, "همهٔ حروف کشف شد! 🎉", 700);
+}
+
+/* ============================================================
+   LETTER GUESS
+   ============================================================ */
+function guessLetter(letter, fromAI = false) {
+  // قفل انسانی در نوبت AI
+  if (State.aiTurn && !fromAI) return;
+  if (!State.turnActive || State.turnResolved || State.paused) return;
+  if (State.correctLetters.has(letter) || State.wrongLetters.includes(letter)) {
+    if (!fromAI) toast("این حرف قبلاً حدس زده شده", "err");
+    return;
+  }
+
+  const indices = [];
+  for (let i = 0; i < State.word.length; i++) {
+    if (State.word[i] === letter && !State.revealed[i]) indices.push(i);
+  }
+
+  if (indices.length > 0) {
+    State.correctLetters.add(letter);
+    indices.forEach(i => State.revealed[i] = true);
+    indices.forEach((i, k) => {
+      setTimeout(() => {
+        const slot = $(`.slot[data-i="${i}"]`);
+        if (slot) { slot.textContent = letter; slot.classList.add("revealed"); }
+      }, k * 120);
+    });
+    sfx.correct();
+    vibrate([30, 30, 30]);
+    const ab = $(`.alpha-btn[data-letter="${letter}"]`);
+    if (ab) { ab.classList.add("correct"); ab.disabled = true; }
+    if (State.revealed.every(r => r)) scheduleTurnEnd(true, "همهٔ حروف کشف شد! 🎉", 700);
+  } else {
+    State.wrongLetters.push(letter);
+    const wrongRow = $(".wrong-row");
+    if (wrongRow) wrongRow.append(el("div", { class: "wrong-letter" }, letter));
+    const ab = $(`.alpha-btn[data-letter="${letter}"]`);
+    if (ab) { ab.classList.add("wrong"); ab.disabled = true; }
+    const cnt = $("#cntLetter");
+    if (cnt) cnt.textContent = `حرف غلط: ${State.wrongLetters.length} / ${State.maxWrongLetters}`;
+    sfx.wrong();
+    vibrate(60);
+    if (State.wrongLetters.length >= State.maxWrongLetters) scheduleTurnEnd(false, "تعداد حروف غلط به سقف رسید!", 700);
+  }
+}
+
+/* ============================================================
+   FULL WORD GUESS
+   ============================================================ */
+function guessFullWord(word, fromAI = false) {
+  if (State.aiTurn && !fromAI) return;
+  if (!State.turnActive || State.turnResolved || State.paused) return;
+
+  if (word === State.word) {
+    State.revealed = new Array(State.word.length).fill(true);
+    for (let i = 0; i < State.word.length; i++) {
+      const slot = $(`.slot[data-i="${i}"]`);
+      if (slot) { slot.textContent = State.word[i]; slot.classList.add("revealed"); }
+    }
+    sfx.win();
+    vibrate([50, 40, 50, 40, 80]);
+    winOverlay();
+    confetti();
+    scheduleTurnEnd(true, "کلمه درست حدس زده شد! 🎉", 900);
+  } else {
+    if (State.wrongWords.includes(word)) {
+      if (!fromAI) toast("این کلمه را قبلاً حدس زده‌اید", "err");
+      return;
+    }
+    State.wrongWords.push(word);
+    const wrongRow = $(".wrong-row");
+    if (wrongRow) wrongRow.append(el("div", { class: "wrong-word" }, word));
+    const cnt = $("#cntWord");
+    if (cnt) cnt.textContent = `کلمهٔ غلط: ${State.wrongWords.length} / ${State.maxWrongWords}`;
+    sfx.wrong();
+    vibrate(80);
+    if (State.wrongWords.length >= State.maxWrongWords) scheduleTurnEnd(false, `${State.maxWrongWords} حدس کامل غلط!`, 700);
+  }
+}
+
+/* ============================================================
+   SCHEDULE / FINISH TURN
+   ============================================================ */
+function scheduleTurnEnd(win, reason, delayMs = 700) {
+  if (State.turnResolved) return;
+  State.turnResolved = true;
+  State.turnActive = false;
+  if (State.timerId) { clearInterval(State.timerId); State.timerId = null; }
+
+  // ابطال همهٔ درخواست‌های AI معلق
+  abortCurrentTurn();
+
+  // غیرفعال کردن کنترل‌ها
+  $$(".alpha-btn").forEach(b => b.disabled = true);
+  $$(".full-word input").forEach(i => i.disabled = true);
+  $$(".hint-row button").forEach(b => b.disabled = true);
+
+  if (win) sfx.win(); else sfx.lose();
+  setTimeout(() => finishTurn(win, reason), delayMs);
+}
+
+function finishTurn(win, reason) {
+  const turn = State.currentTurn;
+  const delta = computeScores(win);
+
+  for (const [k, v] of Object.entries(delta)) State.scores[k] = (State.scores[k] || 0) + v;
+
+  if (win) {
+    turn.guesserIds.forEach(id => { if (State.stats[id]) State.stats[id].wins++; });
+    if (State.stats[turn.giverId]) State.stats[turn.giverId].losses++;
+  } else {
+    turn.guesserIds.forEach(id => { if (State.stats[id]) State.stats[id].losses++; });
+    if (State.stats[turn.giverId]) State.stats[turn.giverId].wins++;
+  }
+
+  State.turnHistory.push({
+    round: State.currentRound,
+    giverName: getPlayer(turn.giverId)?.name || "?",
+    giverIsAI: !!getPlayer(turn.giverId)?.isAI,
+    guesserLabel: turn.guesserLabel,
+    word: State.word,
+    topic: State.topic,
+    win,
+    reason,
+    delta
+  });
+
+  State.lastTurnResult = { win, reason, delta };
+  setScreen("turnResult");
+}
+
+/* ============================================================
+   SCORING
+   ============================================================ */
+function computeScores(win) {
+  const turn = State.currentTurn;
+  const mul = ({ easy: 1.0, medium: 1.3, hard: 1.7 })[State.settings.difficulty] || 1.0;
+  const timeLeft = State.settings.time === 0 ? 30 : Math.max(0, State.timeLeft);
+  const hintPenalty = State.hintsUsed * HINT_PENALTY;
+
+  const out = {};
+
+  if (State.useGroups) {
+    const giverGroupKey = "g_" + turn.giverGroupId;
+    const guesserGroupKeys = turn.guesserGroupIds.map(id => "g_" + id);
+
+    if (win) {
+      let base = 100 + (State.word.length - 3) * 15 + timeLeft * 3
+                - State.wrongLetters.length * 10 - State.wrongWords.length * 25
+                - hintPenalty;
+      base = Math.max(30, base) * mul;
+      const per = Math.max(1, Math.round(base / Math.max(1, guesserGroupKeys.length)));
+      guesserGroupKeys.forEach(k => { out[k] = per; });
+      const giver = Math.max(15, Math.round(State.word.length * 8 - (State.settings.time - State.timeLeft) / 3));
+      out[giverGroupKey] = giver;
+    } else {
+      const giver = Math.round((60 + State.word.length * 10) * mul);
+      out[giverGroupKey] = giver;
+      guesserGroupKeys.forEach(k => { out[k] = 0; });
+    }
+  } else {
+    if (win) {
+      let base = 100 + (State.word.length - 3) * 15 + timeLeft * 3
+                - State.wrongLetters.length * 10 - State.wrongWords.length * 25
+                - hintPenalty;
+      base = Math.max(30, base) * mul;
+      const per = Math.max(1, Math.round(base / Math.max(1, turn.guesserIds.length)));
+      turn.guesserIds.forEach(id => { out[id] = per; });
+      const giver = Math.max(15, Math.round(State.word.length * 8 - (State.settings.time - State.timeLeft) / 3));
+      out[turn.giverId] = giver;
+    } else {
+      const giver = Math.round((60 + State.word.length * 10) * mul);
+      out[turn.giverId] = giver;
+      turn.guesserIds.forEach(id => { out[id] = 0; });
+    }
+  }
+  return out;
+}
+
+/* ============================================================
+   TURN RESULT
+   ============================================================ */
+function renderTurnResult(root) {
+  root.append(topbar());
+  const { win, reason, delta } = State.lastTurnResult;
+  const card = el("div", { class: "card", style: { textAlign: "center" } });
+
+  const color = win ? "var(--green)" : "var(--red)";
+  card.innerHTML = `
+    <div style="font-size:72px;margin:8px 0;animation:floaty 2.5s ease-in-out infinite;">${win ? "🎉" : "😔"}</div>
+    <h2 style="color:${color};font-size:32px;">${win ? "برد!" : "باخت"}</h2>
+    <p class="sub" style="margin-top:6px;">${escapeHtml(reason)}</p>
+  `;
+
+  const wordBox = el("div", { class: "card", style: { margin: "20px 0", background: "rgba(255,255,255,.03)", boxShadow: "none" } });
+  wordBox.innerHTML = `
+    <p class="text-muted" style="margin-bottom:6px;">کلمهٔ درست:</p>
+    <div style="font-size:34px;font-weight:900;color:${color};letter-spacing:8px;text-shadow:0 0 20px ${win ? "rgba(34,197,94,.5)" : "rgba(239,68,68,.5)"};">${escapeHtml(State.word)}</div>
+    <p class="text-muted" style="margin-top:6px;">موضوع: ${escapeHtml(State.topic)} · راهنما: ${State.hintsUsed}</p>
+  `;
+  card.append(wordBox);
+
+  const scoringBox = el("div", { style: { textAlign: "right", marginTop: "18px" } });
+  scoringBox.append(el("h3", {}, "🏅  امتیاز این دور:"));
+  for (const [k, v] of Object.entries(delta)) {
+    let name = k;
+    if (k.startsWith("g_")) {
+      const g = getGroup(k.slice(2));
+      if (g) name = "👥 " + g.name;
+    } else {
+      const p = getPlayer(k);
+      if (p) name = p.name + (p.isAI ? " 🤖" : "");
+    }
+    const row = el("div", { class: "score-row" });
+    row.innerHTML = `<span>${escapeHtml(name)}</span><span class="pts" style="color:${v > 0 ? "var(--gold)" : "#94a3b8"};">${v > 0 ? "+" : ""}${v}</span>`;
+    scoringBox.append(row);
+  }
+  card.append(scoringBox);
+
+  const nav = el("div", { class: "row center", style: { marginTop: "22px", gap: "10px", flexWrap: "wrap" } });
+  const nextBtn = el("button", { style: { padding: "14px 40px", fontSize: "16px" } }, "نوبت بعدی  ›");
+  nextBtn.onclick = () => { sfx.click(); State.turnIdx++; nextTurn(); };
+  nav.append(nextBtn);
+  card.append(nav);
+
+  root.append(card);
+}
+
+/* ============================================================
+   HISTORY
+   ============================================================ */
+function renderHistory(root) {
+  root.append(topbar());
+  const card = el("div", { class: "card" });
+  card.innerHTML = `<h2>📜 تاریخچهٔ دورها</h2><p class="sub">تمام نوبت‌های این بازی.</p>`;
+
+  if (!State.turnHistory.length) {
+    card.append(el("p", { class: "text-muted", style: { textAlign: "center", padding: "30px 0" } }, "هنوز دوری تمام نشده."));
+  } else {
+    const list = el("div");
+    State.turnHistory.forEach((h, i) => {
+      const row = el("div", { class: "history-row " + (h.win ? "win" : "lose") });
+      const left = el("div", { style: { flex: "1 1 200px" } });
+      left.innerHTML = `
+        <div style="font-weight:800;font-size:14px;">${i + 1}. «${escapeHtml(h.word)}» <span class="text-muted">— ${escapeHtml(h.topic)}</span></div>
+        <div class="text-muted" style="margin-top:4px;">راهنما: ${escapeHtml(h.giverName)}${h.giverIsAI ? " 🤖" : ""} · حدس‌زننده: ${escapeHtml(h.guesserLabel)}</div>
+      `;
+      const right = el("div", { style: { textAlign: "center" } });
+      right.innerHTML = `<div style="font-size:20px;">${h.win ? "✅" : "❌"}</div><div class="text-muted" style="font-size:11px;">دور ${h.round}</div>`;
+      row.append(left, right);
+      list.append(row);
+    });
+    card.append(list);
+  }
+
+  const nav = el("div", { class: "row center mt-3" });
+  const back = el("button", { class: "ghost" }, "‹  بازگشت");
+  back.onclick = () => { sfx.click(); setScreen(State.turnActive ? "guess" : (State.turnResolved ? "turnResult" : "end")); };
+  nav.append(back);
+  card.append(nav);
+  root.append(card);
+}
+
+/* ============================================================
+   LEADERBOARD
+   ============================================================ */
+function addToLeaderboard(entries) {
+  const lb = Store.loadLeaderboard();
+  const now = Date.now();
+  entries.forEach(e => {
+    lb.push({ name: e.name, score: e.score, date: now, isAI: !!e.isAI, isGroup: !!e.isGroup });
+  });
+  lb.sort((a, b) => b.score - a.score);
+  Store.saveLeaderboard(lb.slice(0, 50));
+}
+
+function renderLeaderboard(root) {
+  root.append(topbar());
+  const card = el("div", { class: "card" });
+  card.innerHTML = `<h2>🏆 جدول رکوردها</h2><p class="sub">بهترین امتیازها در همهٔ بازی‌ها.</p>`;
+
+  const lb = Store.loadLeaderboard();
+  if (!lb.length) {
+    card.append(el("p", { class: "text-muted", style: { textAlign: "center", padding: "30px 0" } }, "هنوز رکوردی ثبت نشده."));
+  } else {
+    lb.slice(0, 20).forEach((e, i) => {
+      const medal = ["🥇", "🥈", "🥉"][i] || "";
+      const row = el("div", { class: "lb-row" + (i < 3 ? " top" : "") });
+      const left = el("div", { style: { display: "flex", alignItems: "center", gap: "10px" } });
+      left.innerHTML = `
+        <span style="font-size:22px;">${medal}</span>
+        <div>
+          <div style="font-weight:800;font-size:14px;">${escapeHtml(e.name)}${e.isAI ? " 🤖" : ""}${e.isGroup ? " 👥" : ""}</div>
+          <div class="text-muted" style="font-size:11px;">${new Date(e.date).toLocaleDateString("fa-IR")}</div>
+        </div>
+      `;
+      const right = el("div", { class: "pts", style: { fontWeight: "900", color: "var(--gold)", fontSize: "19px" } }, String(e.score));
+      row.append(left, right);
+      card.append(row);
+    });
+  }
+
+  const nav = el("div", { class: "row center mt-3", style: { gap: "10px" } });
+  const back = el("button", { class: "ghost" }, "‹  بازگشت");
+  back.onclick = () => { sfx.click(); setScreen(State.turnQueue.length ? "end" : "splash"); };
+  const clearBtn = el("button", { class: "danger sm" }, "پاک کردن جدول");
+  clearBtn.onclick = () => {
+    showModal({
+      title: "پاک کردن رکوردها؟",
+      bodyHtml: "همهٔ رکوردها حذف می‌شوند.",
+      danger: true,
+      onConfirm: () => { Store.saveLeaderboard([]); sfx.wrong(); render(); }
+    });
+  };
+  nav.append(back, clearBtn);
+  card.append(nav);
+  root.append(card);
+}
+
+/* ============================================================
+   AI STATUS BUBBLE
+   ============================================================ */
+function setAIStatus(text) {
+  const s = $("#ai-status");
+  if (s) s.textContent = text;
+}
+
+/* ============================================================
+   AI GUESS LOOP — Fast, batched, abortable
+   ============================================================ */
+async function aiGuessLoop(token) {
+  const signal = State.turnAbort?.signal;
+  if (!signal) return;
+
+  const aiPlayer = State.guesserIds.map(getPlayer).find(p => p?.isAI);
+  const level = aiPlayer?.level || "medium";
+
+  // تأخیر بسیار کمتر از قبل
+  const delayBase = { easy: 1200, medium: 600, hard: 250 }[level] || 600;
+  const delayJitter = { easy: 600, medium: 400, hard: 200 }[level] || 400;
+  const missChance = { easy: .35, medium: .12, hard: .04 }[level] || .12;
+  const maxAttempts = 40;
+
+  let letterQueue = [];
+  let fetching = false;
+  let wordAttempted = false;
+  let attempts = 0;
+
+  const getCtx = () => ({
+    topic: State.topic,
+    word: State.word,
+    revealed: State.revealed,
+    wrongLetters: State.wrongLetters.slice(),
+    wrongWords: State.wrongWords.slice(),
+    correctLetters: new Set(State.correctLetters)
+  });
+
+  const fetchLetters = async () => {
+    if (fetching || signal.aborted) return;
+    fetching = true;
+    try {
+      setAIStatus("🤖 در حال فکر کردن…");
+      const ctx = getCtx();
+      const letters = await aiSuggestLetters(ctx, 4, signal);
+      // فیلتر دوباره — شاید بین fetch و رسیدن پاسخ، چیزهایی تغییر کرده
+      const fresh = letters.filter(l => !State.correctLetters.has(l) && !State.wrongLetters.includes(l));
+      letterQueue.push(...fresh);
+    } catch (e) {
+      if (e.name === "AbortError") throw e;
+      console.warn("AI letters failed:", e.message);
+    } finally { fetching = false; }
+  };
+
+  // پیش‌واکشی اولیه
+  try { await fetchLetters(); } catch (e) { if (e.name === "AbortError") return; }
+
+  while (State.turnActive && !State.turnResolved && attempts < maxAttempts && token === State.turnToken) {
+    if (signal.aborted) break;
+    attempts++;
+
+    // پیش‌واکشی اگر موجودی کم است (در پس‌زمینه)
+    if (letterQueue.length <= 1 && !fetching) {
+      fetchLetters().catch(() => {});
+    }
+
+    // تأخیر طبیعی
+    await sleep(delayBase + Math.random() * delayJitter);
+    if (!State.turnActive || State.turnResolved || token !== State.turnToken || signal.aborted) break;
+    if (State.paused) { await sleep(400); continue; }
+
+    // آیا حدس کل کلمه؟
+    const revealedCount = State.revealed.filter(Boolean).length;
+    const shouldTryWord = !wordAttempted
+      && State.wrongWords.length < State.maxWrongWords
+      && revealedCount >= Math.ceil(State.word.length * 0.5);
+
+    if (shouldTryWord) {
+      wordAttempted = true;
+      setAIStatus("🤖 در حال حدس کل کلمه…");
+      try {
+        const w = await aiGuessWord(getCtx(), signal);
+        if (!State.turnActive || State.turnResolved || token !== State.turnToken) break;
+        if (w) {
+          sfx.aiPing();
+          guessFullWord(w, true);
+          if (!State.turnActive || State.turnResolved) break;
+        }
+      } catch (e) {
+        if (e.name === "AbortError") break;
+      }
+    }
+
+    // حرف از صف
+    if (!letterQueue.length) {
+      try { await fetchLetters(); } catch (e) { if (e.name === "AbortError") break; }
+    }
+    if (!letterQueue.length) {
+      // فال‌بک: حرف تصادفی
+      const avail = ALPHABET.filter(l => !State.correctLetters.has(l) && !State.wrongLetters.includes(l));
+      if (!avail.length) break;
+      letterQueue.push(randPick(avail));
+    }
+
+    let letter = letterQueue.shift();
+    // شبیه‌سازی خطای انسانی
+    if (Math.random() < missChance) {
+      const avail = ALPHABET.filter(l => !State.correctLetters.has(l) && !State.wrongLetters.includes(l) && l !== letter);
+      if (avail.length) letter = randPick(avail);
+    }
+    if (!letter) continue;
+
+    setAIStatus(`🤖 حرف «${letter}» را امتحان می‌کند…`);
+    sfx.aiPing();
+    guessLetter(letter, true);
+  }
+
+  setAIStatus("🤖 پایان نوبت AI");
+}
+
+async function randomGuessLoop(token) {
+  while (State.turnActive && !State.turnResolved && token === State.turnToken) {
+    await sleep(700 + Math.random() * 500);
+    if (!State.turnActive || State.turnResolved || token !== State.turnToken) break;
+    if (State.paused) continue;
+    const available = ALPHABET.filter(l => !State.correctLetters.has(l) && !State.wrongLetters.includes(l));
+    if (!available.length) break;
+    setAIStatus(`🤖 حرف «${randPick(available)}» را امتحان می‌کند…`);
+    guessLetter(randPick(available), true);
+  }
+}
+
+/* ============================================================
+   END
+   ============================================================ */
+function renderEnd(root) {
+  root.append(topbar({ leaderboard: true, history: State.turnHistory.length > 0 }));
+  const card = el("div", { class: "card" });
+
+  const entries = [];
+  if (State.useGroups) {
+    State.groups.forEach(g => entries.push({ name: g.name, key: "g_" + g.id, isGroup: true }));
+  } else {
+    State.players.forEach(p => entries.push({ name: p.name, key: p.id, isAI: p.isAI }));
+  }
+  entries.forEach(e => {
+    e.score = State.scores[e.key] || 0;
+    e.stats = State.stats[e.key] || { wins: 0, losses: 0 };
+  });
+  entries.sort((a, b) => b.score - a.score);
+
+  card.innerHTML = `<h1>🏆 پایان بازی</h1>`;
+
+  if (entries.length) {
+    const winner = entries[0];
+    const tie = entries.length > 1 && entries[1].score === winner.score;
+    const top = el("div", { style: { textAlign: "center", margin: "24px 0" } });
+    top.innerHTML = `
+      <div style="font-size:74px;animation:floaty 2.5s ease-in-out infinite;">${tie ? "🤝" : "🥇"}</div>
+      <h2 style="color:var(--gold);margin-top:8px;font-size:28px;text-shadow:0 0 30px rgba(245,158,11,.55);">
+        ${tie ? "مساوی!" : "برنده: " + escapeHtml(winner.name)}
+      </h2>
+    `;
+    card.append(top);
+  }
+
+  const table = el("div", { style: { marginTop: "16px" } });
+  entries.forEach((e, i) => {
+    const medal = ["🥇", "🥈", "🥉"][i] || "";
+    const row = el("div", { class: "score-row" + (i === 0 ? " lead" : "") });
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="rank">${medal}</span>
+        <div>
+          <div style="font-weight:800;font-size:15px;">${escapeHtml(e.name)}${e.isAI ? " 🤖" : ""}</div>
+          <div class="text-muted">برد: ${e.stats.wins} · باخت: ${e.stats.losses}</div>
+        </div>
+      </div>
+      <div class="pts">${e.score}</div>
+    `;
+    table.append(row);
+  });
+  card.append(table);
+
+  // باگ‌فیکس: فقط یک بار در طول بازی ثبت شود
+  if (!State.leaderboardSaved) {
+    State.leaderboardSaved = true;
+    addToLeaderboard(entries.map(e => ({ name: e.name, score: e.score, isAI: e.isAI, isGroup: e.isGroup })));
+  }
+
+  const nav = el("div", { class: "row center", style: { marginTop: "26px", gap: "10px", flexWrap: "wrap" } });
+  const shareBtn = el("button", { class: "gold" }, "📤 اشتراک‌گذاری");
+  const historyBtn = el("button", { class: "ghost" }, "📜 تاریخچه");
+  const again = el("button", {}, "🔁  بازی جدید");
+
+  shareBtn.onclick = async () => {
+    const winner = entries[0];
+    const text = `🎯 حدس کلمه\n🏆 برنده: ${winner.name} با ${winner.score} امتیاز\n📊 ${entries.length} شرکت‌کننده`;
+    try {
+      if (navigator.share) await navigator.share({ title: "نتیجهٔ حدس کلمه", text });
+      else {
+        await navigator.clipboard.writeText(text);
+        toast("نتیجه کپی شد!", "ok");
+      }
+    } catch {}
+  };
+  historyBtn.onclick = () => { sfx.click(); setScreen("history"); };
+  again.onclick = () => {
+    sfx.click();
+    Store.clearGame();
+    State.players = []; State.groups = []; State.scores = {}; State.stats = {};
+    State.turnHistory = []; State.turnQueue = []; State.leaderboardSaved = false;
+    setScreen("splash");
+  };
+  nav.append(shareBtn, historyBtn, again);
+  card.append(nav);
+
+  root.append(card);
+  confetti();
+}
+
+/* ============================================================
+   GLOBAL KEYBOARD
+   ============================================================ */
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    const m = $(".modal-bg");
+    if (m) m.remove();
+  }
+  if (State.screen === "guess" && State.turnActive && !State.turnResolved && !State.paused && !State.aiTurn) {
+    const tag = (e.target?.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea") return;
+    if (e.key.length === 1) {
+      const n = normalizeLetter(e.key);
+      if (n) guessLetter(n, false);
+    }
+  }
+});
+
+/* ============================================================
+   GLOBAL ERROR HANDLERS
+   ============================================================ */
+window.addEventListener("error", e => console.error("[Game error]", e.message));
+window.addEventListener("unhandledrejection", e => console.warn("[Unhandled]", e.reason));
+window.addEventListener("beforeunload", () => {
+  if (State.timerId) clearInterval(State.timerId);
+  abortCurrentTurn();
+  const snapshot = captureGameState();
+  if (snapshot) Store.saveGame(snapshot);
+});
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+render();
+</script>
+</body>
+</html>
