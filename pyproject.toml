@@ -1,0 +1,18 @@
+[project]
+name = "neon-ran"
+version = "1.0.0"
+description = "بازی آرکید فارسی نئون‌ران؛ بقا، ستاره‌ها و شهاب‌سنگ‌ها"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flet>=0.83.0,<0.84.0",
+]
+
+[tool.flet]
+org = "com.neonran"
+product = "نئون‌ران"
+company = "Neon Arcade"
+copyright = "Copyright (C) 2026 Neon Arcade"
+
+[tool.flet.android]
+min_sdk_version = 23
