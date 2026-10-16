@@ -1,0 +1,63 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    name: Build Neon Run APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Build Android APK with Flet
+        id: build
+        uses: flet-dev/flet-build-action@v1
+        with:
+          target: apk
+          runner-python-version: "3.13"
+          bundled-python-version: "3.13"
+          build-number: ${{ github.run_number }}
+
+      - name: Find and prepare APK
+        env:
+          BUILD_OUTPUT: ${{ steps.build.outputs.output-path }}
+        run: |
+          set -euo pipefail
+          if [ ! -d "$BUILD_OUTPUT" ]; then
+            echo "::error::Flet build output directory was not found: $BUILD_OUTPUT"
+            exit 1
+          fi
+          APK_PATH="$(find "$BUILD_OUTPUT" -type f -name '*.apk' -print -quit)"
+          if [ -z "$APK_PATH" ]; then
+            echo "::error::Flet completed without producing an APK file."
+            find "$BUILD_OUTPUT" -maxdepth 5 -type f -print
+            exit 1
+          fi
+          cp "$APK_PATH" neon-run.apk
+          echo "APK ready: $APK_PATH"
+          ls -lh neon-run.apk
+          sha256sum neon-run.apk | tee neon-run.apk.sha256
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: neon-run-apk
+          path: |
+            neon-run.apk
+            neon-run.apk.sha256
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
