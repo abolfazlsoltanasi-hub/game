@@ -1,18 +1,22 @@
 [project]
-name = "neon-ran"
+name = "word-guess-fa"
 version = "1.0.0"
-description = "بازی آرکید فارسی نئون‌ران؛ بقا، ستاره‌ها و شهاب‌سنگ‌ها"
+description = "بازی فارسی حدس کلمه؛ حالت گروهی، انفرادی و بازی آفلاین"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "flet>=0.83.0,<0.84.0",
+    "flet==1.0.4",
+    "flet-webview==1.0.4",
 ]
 
 [tool.flet]
-org = "com.neonran"
-product = "نئون‌ران"
-company = "Neon Arcade"
-copyright = "Copyright (C) 2026 Neon Arcade"
+org = "com.wordguess.fa"
+product = "حدس کلمه"
+company = "Word Guess"
+copyright = "Copyright (C) 2026"
 
 [tool.flet.android]
 min_sdk_version = 23
+
+[tool.flet.android.permission]
+"android.permission.INTERNET" = true
