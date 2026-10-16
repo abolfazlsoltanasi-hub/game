@@ -3,7 +3,7 @@ name = "word-guess-fa"
 version = "1.0.0"
 description = "بازی فارسی حدس کلمه؛ حالت گروهی، انفرادی و بازی آفلاین"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 dependencies = [
     "flet==1.0.4",
     "flet-webview==1.0.4",
@@ -14,9 +14,15 @@ org = "com.wordguess.fa"
 product = "حدس کلمه"
 company = "Word Guess"
 copyright = "Copyright (C) 2026"
+icon_background = "#0b0820"
 
 [tool.flet.android]
 min_sdk_version = 23
+adaptive_icon_background = "#0b0820"
 
 [tool.flet.android.permission]
 "android.permission.INTERNET" = true
+
+[tool.flet.splash]
+color = "#0b0820"
+dark_color = "#0b0820"
